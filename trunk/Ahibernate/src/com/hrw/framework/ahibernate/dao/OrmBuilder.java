@@ -1,5 +1,6 @@
 package com.hrw.framework.ahibernate.dao;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 import android.content.ContentValues;
@@ -12,6 +13,14 @@ public class OrmBuilder {
 	public ContentValues mContentValues;
 	public String tableName;
 	public String nullColumnHack;
+	Annotation columnAnnotation = null;
+	Annotation idAnnotation = null;
+	Annotation generatedValueAnnotation = null;
+	Annotation oneToOneAnnotation = null;
+	Annotation manyToOneAnnotation = null;
+	Annotation joinColumnAnnotation = null;
+	Annotation enumeratedAnnotation = null;
+	Annotation versionAnnotation = null;
 
 	// private static String TABLE_NAME = "tableName";
 
@@ -27,13 +36,56 @@ public class OrmBuilder {
 		mContentValues = new ContentValues();
 		// Table table = domain.getClass().getAnnotation(Table.class);
 		// mContentValues.put(TABLE_NAME, table.name());
-		for (Field f : domain.getClass().getDeclaredFields()) {
-			if (f.getAnnotations().length != 0) {
-				f.setAccessible(true);
-				f.getType().getName();
+		for (Field field : domain.getClass().getDeclaredFields()) {
+			if (field.getAnnotations().length != 0) {
+				field.setAccessible(true);
+				field.getType().getName();
+				for (Annotation annotation : field.getAnnotations()) {
+					Class<?> annotationClass = annotation.annotationType();
+					if (annotationClass.getName().equals(
+							"com.hrw.framework.ahibernate.annotation.Column")) {
+						columnAnnotation = annotation;
+						nullColumnHack = field.getAnnotation(Column.class)
+								.name();
+						mContentValues.put(nullColumnHack, field.get(domain)
+								.toString());
+
+					}
+					if (annotationClass.getName().equals(
+							"com.hrw.framework.ahibernate.annotation.Id")) {
+						idAnnotation = annotation;
+					}
+					if (annotationClass
+							.getName()
+							.equals("com.hrw.framework.ahibernate.annotation.GeneratedValue")) {
+						generatedValueAnnotation = annotation;
+					}
+					if (annotationClass.getName().equals(
+							"com.hrw.framework.ahibernate.annotation.OneToOne")) {
+						oneToOneAnnotation = annotation;
+					}
+					if (annotationClass
+							.getName()
+							.equals("com.hrw.framework.ahibernate.annotation.ManyToOne")) {
+						manyToOneAnnotation = annotation;
+					}
+					if (annotationClass
+							.getName()
+							.equals("com.hrw.framework.ahibernate.annotation.JoinColumn")) {
+						joinColumnAnnotation = annotation;
+					}
+					if (annotationClass
+							.getName()
+							.equals("com.hrw.framework.ahibernate.annotation.Enumerated")) {
+						enumeratedAnnotation = annotation;
+					}
+					if (annotationClass.getName().equals(
+							"com.hrw.framework.ahibernate.annotation.Version")) {
+						versionAnnotation = annotation;
+					}
+				}
+
 				// Class.forName(f.getType().getName()).newInstance();
-				mContentValues.put(f.getAnnotation(Column.class).name(),
-						f.get(domain).toString());
 			}
 		}
 		tableName = domain.getClass().getAnnotation(Table.class).name();
