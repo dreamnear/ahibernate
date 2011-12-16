@@ -1,25 +1,70 @@
 package com.hrw.framework.ahibernate.table;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.hrw.framework.ahibernate.annotation.Column;
+import com.hrw.framework.ahibernate.annotation.Id;
+import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.annotation.Table;
 import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
 
 public class TableUtils {
+	private static String DEFAULT_FOREIGN_KEY_SUFFIX = "_id";
 
 	public static <T> TableInfo extractTableInfo(Class<T> clazz) {
 		TableInfo tableInfo = new TableInfo();
 		tableInfo.setTableName(extractTableName(clazz));
+		tableInfo.setIdField(extractIdField(clazz));
 		Field[] fields = clazz.getDeclaredFields();
 		Map<String, Field> fieldNameMap = new HashMap<String, Field>();
+		Annotation[] fieldAnnotations = null;
 		for (Field field : fields) {
-			fieldNameMap.put(field.getName(), field);
+			fieldAnnotations = field.getAnnotations();
+			if (fieldAnnotations.length != 0) {
+				for (Annotation annotation : fieldAnnotations) {
+					String columnName = null;
+					if (annotation instanceof Id) {
+						columnName = ((Id) annotation).name();
+					} else if (annotation instanceof Column) {
+						columnName = ((Column) annotation).name();
+					} else if (annotation instanceof OneToMany) {
+						continue;
+						// Ignore
+					}
+					fieldNameMap.put((columnName != null && !columnName
+							.equals("")) ? columnName : field.getName(), field);
+				}
+			}
+
+			// if (fieldAnnotations.length != 0
+			// && field.getAnnotation(OneToMany.class) == null) {
+			//
+			// if (null != field.getAnnotation(Id.class)) {
+			// columnName = field.getAnnotation(Id.class).name();
+			// }
+			// fieldNameMap.put(
+			// columnName != null ? columnName : field.getName(),
+			// field);
+			// }
 		}
 		tableInfo.setFieldNameMap(fieldNameMap);
 		return tableInfo;
+	}
+
+	public static String buildDropTableStatements(TableInfo tableInfo,
+			boolean ifExists) {
+		// DROP TABLE IF EXISTS avpig_tingshu_book
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("Drop TABLE ");
+		if (ifExists) {
+			sb.append("IF EXISTS ");
+		}
+		sb.append(tableInfo.getTableName());
+		return sb.toString();
 	}
 
 	public static String buildCreateTableStatements(TableInfo tableInfo,
@@ -28,6 +73,7 @@ public class TableUtils {
 		// TEXT CHECK( name != '' ),add_date INTEGER,modified_date INTEGER);
 		StringBuilder sb = new StringBuilder(256);
 		sb.append("CREATE TABLE ");
+
 		if (ifNotExists) {
 			sb.append("IF NOT EXISTS ");
 		}
@@ -36,6 +82,7 @@ public class TableUtils {
 		Boolean isFirst = true;
 		Field idFiled = tableInfo.getIdField();
 		for (@SuppressWarnings("rawtypes")
+		// CREATE TABLE book (id INTEGER PRIMARY KEY, , bookName TEXT)
 		Entry entry : tableInfo.getFieldNameMap().entrySet()) {
 			Field f = (Field) entry.getValue();
 			if (isFirst) {
@@ -46,6 +93,10 @@ public class TableUtils {
 			if (f.getType().getSimpleName().equals("Long")) {
 				sb.append(entry.getKey() + " INTEGER");
 			}
+			// if (f.getType().getSimpleName().equals("List")) {
+			// sb.append(entry.getKey()+DEFAULT_FOREIGN_KEY_SUFFIX +
+			// " INTEGER");
+			// }
 			if (f.getType().getSimpleName().equals("String")) {
 				sb.append(entry.getKey() + " TEXT");
 			}
@@ -76,5 +127,22 @@ public class TableUtils {
 			}
 		}
 		return name;
+	}
+
+	public static <T> Field extractIdField(Class<T> clazz) {
+		Field idField = null;
+		for (Field field : clazz.getDeclaredFields()) {
+			if (field.getAnnotations().length != 0) {
+				field.setAccessible(true);
+				for (Annotation annotation : field.getAnnotations()) {
+					Class<?> annotationClass = annotation.annotationType();
+					if (annotationClass.getName().equals(
+							"com.hrw.framework.ahibernate.annotation.Id")) {
+						idField = field;
+					}
+				}
+			}
+		}
+		return idField;
 	}
 }
