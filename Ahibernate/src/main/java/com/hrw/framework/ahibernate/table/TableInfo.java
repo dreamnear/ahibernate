@@ -4,8 +4,9 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class TableInfo {
-	private String tableName;
+	private Object target;
 
+	private String tableName;
 
 	private Field idField;
 
@@ -17,6 +18,14 @@ public class TableInfo {
 
 	public Field getIdField() {
 		return idField;
+	}
+
+	public Object getTarget() {
+		return target;
+	}
+
+	public void setTarget(Object target) {
+		this.target = target;
 	}
 
 	public void setIdField(Field idField) {
@@ -34,6 +43,5 @@ public class TableInfo {
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
 	}
-
 
 }

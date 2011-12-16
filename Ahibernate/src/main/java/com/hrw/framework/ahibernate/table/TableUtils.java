@@ -67,6 +67,34 @@ public class TableUtils {
 		return sb.toString();
 	}
 
+	// Strubg INSERT = "insert into myTable(date, time, cost) values (?,?,?)";
+	public static String buildInsertTableStatements(TableInfo tableInfo) {
+		// DROP TABLE IF EXISTS avpig_tingshu_book
+		StringBuilder sb = new StringBuilder(256);
+		StringBuilder sbValues = new StringBuilder(256);
+		sb.append("INSERT INTO ");
+		sb.append(tableInfo.getTableName());
+		sb.append(" (");
+		sbValues.append(" (");
+		Boolean isFirst = true;
+		for (@SuppressWarnings("rawtypes")
+		Entry entry : tableInfo.getFieldNameMap().entrySet()) {
+			if (isFirst) {
+				isFirst = false;
+			} else {
+				sb.append(", ");
+				sbValues.append(", ");
+			}
+			sb.append(entry.getKey());
+			sbValues.append("?");
+		}
+		sb.append(")");
+		sbValues.append(")");
+		sb.append(" values");
+		sb.append(sbValues);
+		return sb.toString();
+	}
+
 	public static String buildCreateTableStatements(TableInfo tableInfo,
 			boolean ifNotExists) {
 		// CREATE TABLE IF NOT EXISTS hrw_playlist (id INTEGER PRIMARY KEY,name

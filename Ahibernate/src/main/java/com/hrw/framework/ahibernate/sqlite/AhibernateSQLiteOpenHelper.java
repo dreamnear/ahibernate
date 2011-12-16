@@ -1,4 +1,4 @@
-package com.hrw.framework.ahibernate.dao;
+package com.hrw.framework.ahibernate.sqlite;
 
 import java.util.ArrayList;
 
@@ -10,11 +10,11 @@ import android.util.Log;
 
 import com.hrw.framework.ahibernate.table.TableUtils;
 
-public class AhibernateDaoSupport<T> extends SQLiteOpenHelper {
+public class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 	private final static String TAG = "AhibernateDaoSupport";
 	private ArrayList<String> buildTableStatements = new ArrayList<String>();
 
-	public AhibernateDaoSupport(Context context, String name,
+	public AhibernateSQLiteOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
 		super(context, name, factory, version);
 	}
@@ -45,7 +45,7 @@ public class AhibernateDaoSupport<T> extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		for (String stmt : buildTableStatements) {
-			Log.i(TAG, "Create table statement:" + stmt);
+			Log.i(TAG, "Drop table statement:" + stmt);
 			db.execSQL(stmt);
 		}
 
