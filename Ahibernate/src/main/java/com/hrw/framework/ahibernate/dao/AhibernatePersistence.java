@@ -3,7 +3,7 @@ package com.hrw.framework.ahibernate.dao;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-public class JavaxPersistence {
+public class AhibernatePersistence {
 	/**
 	 * Return the javax.persistence.Entity annotation name for the class
 	 * argument or null if none or if there was no entity name.
