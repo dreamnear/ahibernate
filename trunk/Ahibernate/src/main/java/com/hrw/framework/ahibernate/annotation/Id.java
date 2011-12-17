@@ -11,4 +11,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 public @interface Id {
 	String name() default "";
+
+	boolean autoGenerate() default true;
 }
