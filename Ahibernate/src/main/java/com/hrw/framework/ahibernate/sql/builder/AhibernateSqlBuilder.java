@@ -12,14 +12,9 @@ import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.table.TableInfo;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
-public class AhibernateSqlBuilder implements SqlBuilder {
+public class AhibernateSqlBuilder<T> implements SqlBuilder<T> {
 
 	public String buildCreateTableSql(TableInfo tableInfo, boolean ifNotExists) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public String buildInsertSql(InsertData data) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -88,5 +83,19 @@ public class AhibernateSqlBuilder implements SqlBuilder {
 		insertData.setColumnAndValue(columnAndValue);
 		insertData.setInsertSql(sb.toString());
 		return insertData;
+	}
+
+	// SELECT * FROM avpig_tingshu_book;
+	public QueryData buildQueryData(Object object) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public String buildQueryAllSql(Class clazz) {
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("SELECT * FROM ");
+		sb.append(TableUtils.extractTableName(clazz));
+		return sb.toString();
 	}
 }
