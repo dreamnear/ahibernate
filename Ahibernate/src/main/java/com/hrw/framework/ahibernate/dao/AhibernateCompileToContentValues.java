@@ -3,11 +3,11 @@ package com.hrw.framework.ahibernate.dao;
 import android.content.ContentValues;
 
 public class AhibernateCompileToContentValues<T> {
-	public OrmBuilder ormBuilder;
+	public OrmContentValuesBuilder ormBuilder;
 
 	public ContentValues compile(T object) throws IllegalArgumentException,
 			IllegalAccessException {
-		ormBuilder = OrmBuilder.getInstance();
+		ormBuilder = OrmContentValuesBuilder.getInstance();
 		return ormBuilder.bulid(object);
 	}
 
