@@ -16,6 +16,10 @@ public class Book extends BaseDomain {
 	@OneToMany
 	private List<Chapter> chapter;
 
+	public Book() {
+
+	}
+
 	public List<Chapter> getChapter() {
 		return chapter;
 	}
