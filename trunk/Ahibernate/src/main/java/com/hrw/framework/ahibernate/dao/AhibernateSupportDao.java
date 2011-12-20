@@ -66,11 +66,20 @@ public class AhibernateSupportDao<T> extends ContextWrapper implements
 		}
 	}
 
-	public int save(Object entity) throws IllegalArgumentException,
-			IllegalAccessException, SQLException {
-		InsertData insertData = sqlBuilder.buildInsertData(entity);
-		return insert(insertData.getInsertSql(), insertData.getColumnAndValue()
-				.values().toArray());
+	public int save(Object entity) {
+		try {
+			InsertData insertData = sqlBuilder.buildInsertData(entity);
+			return insert(insertData.getInsertSql(), insertData
+					.getColumnAndValue().values().toArray());
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+
 	}
 
 	public int delete(T t) {
@@ -101,8 +110,7 @@ public class AhibernateSupportDao<T> extends ContextWrapper implements
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<T> getAll(Class<T> clazz) throws InstantiationException,
-			IllegalAccessException {
+	public List<T> getAll(Class<T> clazz) {
 		List<T> queryList = new ArrayList<T>();
 		String sql = sqlBuilder.buildQueryAllSql(clazz);
 		SQLiteDatabase db = sqliteOpenHelper.getWritableDatabase();
@@ -111,43 +119,51 @@ public class AhibernateSupportDao<T> extends ContextWrapper implements
 		if (cursor.moveToFirst()) {
 			for (int i = 0; i < cursor.getCount(); i++) {
 				cursor.moveToPosition(i);
-				T t = clazz.newInstance();
-				Annotation[] fieldAnnotations = null;
-				for (Field field : fields) {
-					field.setAccessible(true);
-					fieldAnnotations = field.getAnnotations();
-					if (fieldAnnotations.length != 0) {
-						for (Annotation annotation : fieldAnnotations) {
-							String columnName = null;
-							if (annotation instanceof Id) {
-								columnName = ((Id) annotation).name();
-							} else if (annotation instanceof Column) {
-								columnName = ((Column) annotation).name();
-							} else if (annotation instanceof OneToMany) {
-								continue;
-								// Ignore
-							}
-							if (field.getType().getSimpleName().equals("Long")) {
-								field.set(
-										t,
-										cursor.getLong(cursor
-												.getColumnIndexOrThrow((columnName != null && !columnName
-														.equals("")) ? columnName
-														: field.getName())));
-							} else if (field.getType().getSimpleName()
-									.equals("String")) {
-								field.set(
-										t,
-										cursor.getString(cursor
-												.getColumnIndexOrThrow((columnName != null && !columnName
-														.equals("")) ? columnName
-														: field.getName())));
-							}
+				try {
+					T t = clazz.newInstance();
+					Annotation[] fieldAnnotations = null;
+					for (Field field : fields) {
+						field.setAccessible(true);
+						fieldAnnotations = field.getAnnotations();
+						if (fieldAnnotations.length != 0) {
+							for (Annotation annotation : fieldAnnotations) {
+								String columnName = null;
+								if (annotation instanceof Id) {
+									columnName = ((Id) annotation).name();
+								} else if (annotation instanceof Column) {
+									columnName = ((Column) annotation).name();
+								} else if (annotation instanceof OneToMany) {
+									continue;
+									// Ignore
+								}
+								if (field.getType().getSimpleName()
+										.equals("Long")) {
+									field.set(
+											t,
+											cursor.getLong(cursor
+													.getColumnIndexOrThrow((columnName != null && !columnName
+															.equals("")) ? columnName
+															: field.getName())));
+								} else if (field.getType().getSimpleName()
+										.equals("String")) {
+									field.set(
+											t,
+											cursor.getString(cursor
+													.getColumnIndexOrThrow((columnName != null && !columnName
+															.equals("")) ? columnName
+															: field.getName())));
+								}
 
+							}
 						}
 					}
+					queryList.add(t);
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
 				}
-				queryList.add(t);
+
 			}
 		}
 		cursor.close();
