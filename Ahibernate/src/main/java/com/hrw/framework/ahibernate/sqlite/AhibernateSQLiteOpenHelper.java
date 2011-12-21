@@ -22,16 +22,32 @@ import com.hrw.framework.ahibernate.sql.builder.InsertData;
 import com.hrw.framework.ahibernate.sql.builder.SqlBuilder;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
-public class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
-	private final static String TAG = "AhibernateDaoSupport";
-	SqlBuilder sqlBuilder;
+public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
+	private final static String TAG = "AhibernateSQLiteOpenHelper";
+	private SqlBuilder<T> sqlBuilder;
 
 	private ArrayList<String> buildTableStatements = new ArrayList<String>();
+
+	private ArrayList<String> buildInitDataStatements = new ArrayList<String>();
 
 	public AhibernateSQLiteOpenHelper(Context context, String name,
 			CursorFactory factory, int version) {
 		super(context, name, factory, version);
-		sqlBuilder = new AhibernateSqlBuilder();
+		sqlBuilder = new AhibernateSqlBuilder<T>();
+	}
+
+	public void prepareCreateInitDataStatements(Object... objects) {
+		for (Object object : objects) {
+			InsertData insertData = buildInsertData(object);
+			try {
+				buildInitDataStatements.add(bindArgs(insertData.getInsertSql(),
+						insertData.getColumnAndValue().values().toArray()));
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -56,6 +72,10 @@ public class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		for (String stmt : buildTableStatements) {
 			Log.i(TAG, "Create table statement:" + stmt);
+			db.execSQL(stmt);
+		}
+		for (String stmt : buildInitDataStatements) {
+			Log.i(TAG, "Init data statement:" + stmt);
 			db.execSQL(stmt);
 		}
 
@@ -94,24 +114,47 @@ public class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 	}
 
 	public int save(Object entity) {
+		InsertData insertData = buildInsertData(entity);
 		try {
-			InsertData insertData = sqlBuilder.buildInsertData(entity);
 			return insert(insertData.getInsertSql(), insertData
 					.getColumnAndValue().values().toArray());
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
 		} catch (SQLException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
+	}
 
+	public InsertData buildInsertData(Object entity) {
+		try {
+			return sqlBuilder.buildInsertData(entity);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public int delete(T t) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@SuppressWarnings("null")
+	private String bindArgs(String stmt, Object[] args) throws SQLException {
+		if (args == null) {
+			return stmt;
+		}
+		for (int i = 0; i < args.length; i++) {
+			Object arg = args[i];
+			if (arg != null) {
+				stmt = stmt.replaceFirst("\\?", "'"+arg.toString()+"'");
+			}
+		}
+		return stmt;
 	}
 
 	private void bindArgs(SQLiteStatement stmt, Object[] args)
