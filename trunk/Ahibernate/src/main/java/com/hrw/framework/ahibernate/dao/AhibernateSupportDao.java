@@ -108,8 +108,7 @@ public class AhibernateSupportDao<T> extends ContextWrapper implements
 			}
 		}
 	}
- 
-	
+
 	@SuppressWarnings("unchecked")
 	public List<T> getAll(Class<T> clazz) {
 		List<T> queryList = new ArrayList<T>();
