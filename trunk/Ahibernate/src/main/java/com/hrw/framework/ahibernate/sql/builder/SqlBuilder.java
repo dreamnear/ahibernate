@@ -27,4 +27,6 @@ public interface SqlBuilder<T> {
 
 	String buildQueryAllSql(Class<T> clazz);
 
+	String buidlDeleteSql(T object);
+
 }
