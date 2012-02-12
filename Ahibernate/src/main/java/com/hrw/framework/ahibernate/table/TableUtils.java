@@ -67,6 +67,14 @@ public class TableUtils {
 		return sb.toString();
 	}
 
+	public static Object getFieldValue(String filedName, Object obj)
+			throws IllegalArgumentException, SecurityException,
+			IllegalAccessException, NoSuchFieldException {
+		Field field = obj.getClass().getDeclaredField(filedName);
+		field.setAccessible(true);
+		return field.get(obj);
+	}
+
 	// Strubg INSERT = "insert into myTable(date, time, cost) values (?,?,?)";
 	public static String buildInsertTableStatements(TableInfo tableInfo) {
 		// DROP TABLE IF EXISTS avpig_tingshu_book

@@ -82,8 +82,9 @@ public class AhibernateSupportDao<T> extends ContextWrapper implements
 
 	}
 
-	public int delete(T t) {
-		// TODO Auto-generated method stub
+	public int delete(Object entity) {
+		SQLiteDatabase db = sqliteOpenHelper.getWritableDatabase();
+		
 		return 0;
 	}
 

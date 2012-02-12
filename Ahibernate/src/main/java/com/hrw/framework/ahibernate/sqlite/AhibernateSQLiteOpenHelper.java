@@ -139,7 +139,26 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 	}
 
 	public int delete(T t) {
-		// TODO Auto-generated method stub
+		SQLiteDatabase db = getWritableDatabase();
+		String tableName = TableUtils.extractTableName(t.getClass());
+		String filedName = TableUtils.extractIdField(t.getClass()).getName();
+		String fieldValue;
+		try {
+			fieldValue = TableUtils.getFieldValue(filedName, t).toString();
+			return db.delete(tableName, filedName +" = ?" , new String[] { fieldValue });
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (NoSuchFieldException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return 0;
 	}
 
@@ -151,7 +170,7 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 		for (int i = 0; i < args.length; i++) {
 			Object arg = args[i];
 			if (arg != null) {
-				stmt = stmt.replaceFirst("\\?", "'"+arg.toString()+"'");
+				stmt = stmt.replaceFirst("\\?", "'" + arg.toString() + "'");
 			}
 		}
 		return stmt;

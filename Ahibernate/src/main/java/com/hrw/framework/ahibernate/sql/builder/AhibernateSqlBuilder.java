@@ -98,4 +98,11 @@ public class AhibernateSqlBuilder<T> implements SqlBuilder<T> {
 		sb.append(TableUtils.extractTableName(clazz));
 		return sb.toString();
 	}
+
+	public String buidlDeleteSql(T object) {
+		StringBuilder sb = new StringBuilder(256);
+		sb.append("DELETE  FROM ");
+		sb.append(TableUtils.extractTableName(object.getClass()));
+		return sb.toString();
+	}
 }
