@@ -26,6 +26,8 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 	private final static String TAG = "AhibernateSQLiteOpenHelper";
 	private SqlBuilder<T> sqlBuilder;
 
+	private static String EMPTY_SQL = "DELETE FROM ";
+
 	private ArrayList<String> buildTableStatements = new ArrayList<String>();
 
 	private ArrayList<String> buildInitDataStatements = new ArrayList<String>();
@@ -79,6 +81,11 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 			db.execSQL(stmt);
 		}
 
+	}
+
+	public void truncate(Class<T> clazz) {
+		SQLiteDatabase db = getWritableDatabase();
+		db.execSQL(EMPTY_SQL + TableUtils.extractTableName(clazz));
 	}
 
 	@Override
@@ -145,7 +152,8 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
 		String fieldValue;
 		try {
 			fieldValue = TableUtils.getFieldValue(filedName, t).toString();
-			return db.delete(tableName, filedName +" = ?" , new String[] { fieldValue });
+			return db.delete(tableName, filedName + " = ?",
+					new String[] { fieldValue });
 		} catch (IllegalArgumentException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
