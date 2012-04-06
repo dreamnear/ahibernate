@@ -100,7 +100,7 @@ public abstract class AhibernateHelper extends SQLiteOpenHelper {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public InsertData buildInsertData(Object entity)
+	private InsertData buildInsertData(Object entity)
 			throws IllegalArgumentException, IllegalAccessException {
 		Class clazz = entity.getClass();
 		Field idField = TableUtils.extractIdField(clazz);
