@@ -32,8 +32,8 @@ public abstract class AhibernateHelper extends SQLiteOpenHelper {
 	 * @param factory
 	 * @param version
 	 */
-	public AhibernateHelper(Context context, String name, CursorFactory factory,
-			int version) {
+	public AhibernateHelper(Context context, String name,
+			CursorFactory factory, int version) {
 		// create database when fist call
 		// SQLiteOpenHelper.getWritableDatabase().
 		super(context, name, factory, version);
@@ -76,6 +76,15 @@ public abstract class AhibernateHelper extends SQLiteOpenHelper {
 		for (Class clazz : clazzs) {
 			db.execSQL(TableUtils.buildCreateTableStatements(
 					TableUtils.extractTableInfo(clazz), ifNotExists));
+		}
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void dropTables(boolean ifNotExists, Class... clazzs) {
+		SQLiteDatabase db = getWritableDatabase();
+		for (Class clazz : clazzs) {
+			db.execSQL(TableUtils.buildDropTableStatements(
+					TableUtils.extractTableInfo(clazz), true));
 		}
 	}
 
