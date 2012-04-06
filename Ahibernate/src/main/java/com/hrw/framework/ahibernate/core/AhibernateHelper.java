@@ -79,15 +79,24 @@ public abstract class AhibernateHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	/**
+	 * 
+	 * @param objects
+	 * @return i- how many line effected.
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
 	public int save(Object... objects) throws IllegalArgumentException,
 			IllegalAccessException {
 		SQLiteDatabase db = getWritableDatabase();
+		int i = -1;
 		for (Object object : objects) {
 			InsertData insertData = buildInsertData(object);
 			db.execSQL(insertData.getInsertSql(), insertData
 					.getColumnAndValue().values().toArray());
+			i++;
 		}
-		return 0;
+		return i;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
