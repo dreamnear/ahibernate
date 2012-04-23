@@ -15,9 +15,9 @@ import android.database.sqlite.SQLiteStatement;
 import com.hrw.framework.ahibernate.annotation.Column;
 import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
-import com.hrw.framework.ahibernate.sql.builder.AhibernateSqlBuilder;
-import com.hrw.framework.ahibernate.sql.builder.InsertData;
-import com.hrw.framework.ahibernate.sql.builder.SqlBuilder;
+import com.hrw.framework.ahibernate.builder.AhibernateSqlBuilder;
+import com.hrw.framework.ahibernate.builder.InsertData;
+import com.hrw.framework.ahibernate.builder.SqlBuilder;
 import com.hrw.framework.ahibernate.sqlite.AhibernateSQLiteOpenHelper;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
