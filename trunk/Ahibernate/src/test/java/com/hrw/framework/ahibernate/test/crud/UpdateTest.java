@@ -13,6 +13,7 @@ public class UpdateTest {
     // UPDATE null SET id = null, book_name = testBook where id = 1 and name = 2
     private static String EXPECTED_UPDATE_SQL4 = "UPDATE book SET book_name = testBook where id = 1 and name = 2";
 
+    private static String EXPECTED_UPDATE_SQL5 = "UPDATE book SET book_name = testBook where id = 1";
     @Test
     public void testGetUpdateFields1() throws IllegalArgumentException, IllegalAccessException {
         Book book = new Book();
@@ -39,17 +40,15 @@ public class UpdateTest {
         Assert.assertEquals("book", update.getTableName());
     }
 
-    // @Test
-    // public void testAddWhereClause() {
-    // Book book = new Book();
-    // book.setBookName("testBook");
-    // HashMap<String, String> where = new HashMap<String, String>();
-    // where.put("id", "1");
-    // where.put("name", "2");
-    // Update update = new Update(book, where);
-    //
-    // Assert.assertEquals("book", update.getTableName());
-    // }
+    @Test
+    public void testAddWhereClause1() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
+        book.setId(1l);
+        book.setBookName("testBook");
+        Update update = new Update(book);
+        Assert.assertNotNull(update.getWhereFiled().get("id"));
+        Assert.assertEquals(EXPECTED_UPDATE_SQL5, update.testToStatementString());
+    }
 
     @Test
     public void testToStatementString() throws IllegalArgumentException, IllegalAccessException {
