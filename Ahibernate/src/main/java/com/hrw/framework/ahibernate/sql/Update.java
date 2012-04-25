@@ -17,14 +17,14 @@ public class Update {
 
     private String tableName;
 
-    private HashMap<String, String> where;
+    private Map<String, String> where;
 
     public Update(Object entity) {
         this.entity = entity;
         this.tableName = TableUtils.extractTableName(entity.getClass());
     }
 
-    public Update(Object entity, HashMap<String, String> where) {
+    public Update(Object entity, Map<String, String> where) {
         this.entity = entity;
         this.where = where;
         this.tableName = TableUtils.extractTableName(entity.getClass());
@@ -43,8 +43,8 @@ public class Update {
                 for (Annotation annotation : fieldAnnotations) {
                     String columnName = null;
                     if (annotation instanceof Id) {
-                        //do not update id.default primary key
-//                        columnName = ((Id) annotation).name();
+                        // do not update id.default primary key
+                        // columnName = ((Id) annotation).name();
                         continue;
                     } else if (annotation instanceof Column) {
                         columnName = ((Column) annotation).name();
@@ -63,7 +63,6 @@ public class Update {
     }
 
     public String testToStatementString() throws IllegalArgumentException, IllegalAccessException {
-
         return DataBuilder.buildUpdateSql(tableName, getUpdateFields(), where);
     }
 
