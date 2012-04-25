@@ -156,7 +156,7 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
         List<T> queryList = new ArrayList<T>();
         SQLiteDatabase db = getReadableDatabase();
         String tableName = TableUtils.extractTableName(clazz);
-        String sql = DataBuilder.buildQuerySql(tableName, fieldName, fieldValue);
+        String sql = DataBuilder.buildQueryByFieldSql(tableName, fieldName, fieldValue);
         Cursor cursor = db.rawQuery(sql, null);
         Field[] fields = clazz.getDeclaredFields();
         if (cursor.moveToFirst()) {
