@@ -4,6 +4,7 @@ package com.hrw.framework.ahibernate.builder;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -13,6 +14,57 @@ import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
 public class DataBuilder {
+    // Update T1 Set Column1 = v1,Column2 =V2 Where key = V3;//TODO
+    public static String buildUpdateSql(Object entity) throws IllegalArgumentException,
+            IllegalAccessException {
+
+        Class clazz = entity.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        Map<String, Object> columnAndValue = new HashMap<String, Object>();
+
+        String tableName = TableUtils.extractTableName(clazz);
+
+        Annotation[] fieldAnnotations = null;
+        for (Field field : fields) {
+            field.setAccessible(true);
+            fieldAnnotations = field.getAnnotations();
+            if (fieldAnnotations.length != 0) {
+                for (Annotation annotation : fieldAnnotations) {
+                    String columnName = null;
+                    if (annotation instanceof Id) {
+                        if (((Id) annotation).autoGenerate()) {
+                            continue;
+                        } else {
+                            columnName = ((Id) annotation).name();
+                        }
+                    } else if (annotation instanceof Column) {
+                        columnName = ((Column) annotation).name();
+                    } else if (annotation instanceof OneToMany) {
+                        continue;
+                        // Ignore
+                    }
+                    columnAndValue.put((columnName != null && !columnName.equals("")) ? columnName
+                            : field.getName(), field.get(entity));
+                }
+
+            }
+        }
+        // builder update sql.
+        StringBuilder updateSql = new StringBuilder(256);
+
+        updateSql.append("UPDATE ");
+        updateSql.append(tableName);
+        updateSql.append("SET ");
+
+        for (Entry entry : columnAndValue.entrySet()) {
+            updateSql.append(entry.getKey() + "=" + entry.getValue());
+        }
+
+        updateSql.append("WHERE ");
+        return updateSql.toString();
+
+    }
+
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
@@ -75,13 +127,13 @@ public class DataBuilder {
         return insertSql.toString();
     }
 
-    public static String buildQuerySql(String tableName, String fieldName, String fieldValue) {
+    public static String buildQueryByFieldSql(String tableName, String fieldName, String fieldValue) {
         StringBuilder sb = new StringBuilder(256);
         sb.append("SELECT * FROM ");
         sb.append(tableName);
         sb.append(" WHERE ");
         sb.append(fieldName);
-        sb.append("=");
+        sb.append(" = ");
         sb.append("'");
         sb.append(fieldValue);
         sb.append("'");
@@ -95,6 +147,40 @@ public class DataBuilder {
         StringBuilder sb = new StringBuilder(256);
         sb.append("SELECT * FROM ");
         sb.append(TableUtils.extractTableName(clazz));
+        return sb.toString();
+    }
+
+    public static String buildUpdateSql(String tableName, Map<String, String> needUpdate,
+            Map<String, String> where) {
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("UPDATE ");
+        sb.append(tableName).append(" SET ");
+
+        Iterator iter = needUpdate.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry e = (Map.Entry) iter.next();
+            sb.append(e.getKey()).append(" = ").append(e.getValue());
+            if (iter.hasNext()) {
+                sb.append(", ");
+            }
+        }
+        // for (Entry<String, String> entry : needUpdate.entrySet()) {
+        // sb.append(" SET ");
+        // sb.append(entry.getKey());
+        // sb.append(" = ");
+        // sb.append(entry.getValue());
+        // }
+        if (where != null) {
+            sb.append(" where ");
+            iter = where.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry e = (Map.Entry) iter.next();
+                sb.append(e.getKey()).append(" = ").append(e.getValue());
+                if (iter.hasNext()) {
+                    sb.append(" and ");
+                }
+            }
+        }
         return sb.toString();
     }
 }
