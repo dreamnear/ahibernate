@@ -21,6 +21,13 @@ public class Update {
 
     public Update(Object entity) {
         this.entity = entity;
+        try {
+            this.where = getDefaultWhereField();
+        } catch (IllegalArgumentException e) {
+            this.where = null;
+        } catch (IllegalAccessException e) {
+            this.where = null;
+        }
         this.tableName = TableUtils.extractTableName(entity.getClass());
     }
 
@@ -28,6 +35,34 @@ public class Update {
         this.entity = entity;
         this.where = where;
         this.tableName = TableUtils.extractTableName(entity.getClass());
+    }
+
+    public Map<String, String> getDefaultWhereField() throws IllegalArgumentException,
+            IllegalAccessException {
+        Map<String, String> defaultWhereField = new HashMap<String, String>();
+        Class clazz = entity.getClass();
+        Field[] fields = clazz.getDeclaredFields();
+        Annotation[] fieldAnnotations = null;
+        for (Field field : fields) {
+            fieldAnnotations = field.getAnnotations();
+            if (fieldAnnotations.length != 0) {
+                for (Annotation annotation : fieldAnnotations) {
+                    String columnName = null;
+                    if (annotation instanceof Id) {
+                        // do not update id.default primary key
+                        columnName = ((Id) annotation).name();
+                        field.setAccessible(true);
+                        defaultWhereField.put(
+                                (columnName != null && !columnName.equals("")) ? columnName : field
+                                        .getName(), field.get(entity) == null ? null : field
+                                        .get(entity).toString());
+                    }
+                 
+                }
+            }
+        }
+        return defaultWhereField;
+
     }
 
     @SuppressWarnings("rawtypes")
@@ -68,6 +103,10 @@ public class Update {
 
     public String getTableName() {
         return tableName;
+    }
+
+    public Map<String, String> getWhereFiled() {
+        return where;
     }
 
 }
