@@ -64,8 +64,7 @@ public class Update extends Operate {
     }
 
     @SuppressWarnings("rawtypes")
-    public Map<String, String> getUpdateFields() throws IllegalArgumentException,
-            IllegalAccessException {
+    public Map<String, String> getUpdateFields() {
         Map<String, String> updateFields = new HashMap<String, String>();
         Class clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
@@ -86,16 +85,25 @@ public class Update extends Operate {
                         // Ignore
                     }
                     field.setAccessible(true);
-                    updateFields.put((columnName != null && !columnName.equals("")) ? columnName
-                            : field.getName(), field.get(entity) == null ? null : field.get(entity)
-                            .toString());
+                    try {
+                        updateFields.put(
+                                (columnName != null && !columnName.equals("")) ? columnName : field
+                                        .getName(),
+                                field.get(entity) == null ? null : field.get(entity).toString());
+                    } catch (IllegalArgumentException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
         }
         return updateFields;
     }
 
-    public String toStatementString() throws IllegalArgumentException, IllegalAccessException {
+    public String toStatementString() {
         return buildUpdateSql(getTableName(), getUpdateFields(), where);
     }
 
