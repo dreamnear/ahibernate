@@ -12,14 +12,13 @@ import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.builder.DataBuilder;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
-public class Update {
+public class Update extends Operate {
     private Object entity;
-
-    private String tableName;
 
     private Map<String, String> where;
 
     public Update(Object entity) {
+        super(entity.getClass());
         this.entity = entity;
         try {
             this.where = getDefaultWhereField();
@@ -28,13 +27,12 @@ public class Update {
         } catch (IllegalAccessException e) {
             this.where = null;
         }
-        this.tableName = TableUtils.extractTableName(entity.getClass());
     }
 
     public Update(Object entity, Map<String, String> where) {
+        super(entity.getClass());
         this.entity = entity;
         this.where = where;
-        this.tableName = TableUtils.extractTableName(entity.getClass());
     }
 
     public Map<String, String> getDefaultWhereField() throws IllegalArgumentException,
@@ -54,10 +52,10 @@ public class Update {
                         field.setAccessible(true);
                         defaultWhereField.put(
                                 (columnName != null && !columnName.equals("")) ? columnName : field
-                                        .getName(), field.get(entity) == null ? null : field
-                                        .get(entity).toString());
+                                        .getName(),
+                                field.get(entity) == null ? null : field.get(entity).toString());
                     }
-                 
+
                 }
             }
         }
@@ -97,12 +95,8 @@ public class Update {
         return updateFields;
     }
 
-    public String testToStatementString() throws IllegalArgumentException, IllegalAccessException {
-        return DataBuilder.buildUpdateSql(tableName, getUpdateFields(), where);
-    }
-
-    public String getTableName() {
-        return tableName;
+    public String toStatementString() throws IllegalArgumentException, IllegalAccessException {
+        return buildUpdateSql(getTableName(), getUpdateFields(), where);
     }
 
     public Map<String, String> getWhereFiled() {
