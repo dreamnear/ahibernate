@@ -19,6 +19,8 @@ import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.builder.DataBuilder;
 import com.hrw.framework.ahibernate.builder.InsertData;
+import com.hrw.framework.ahibernate.sql.Insert;
+import com.hrw.framework.ahibernate.sql.Update;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
 public abstract class AhibernateHelper<T> extends SQLiteOpenHelper {
@@ -106,7 +108,7 @@ public abstract class AhibernateHelper<T> extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
         int i = -1;
         for (Object object : objects) {
-            String insertSql = DataBuilder.buildInsertSql(object);
+            String insertSql = new Insert(object).toStatementString();
             db.execSQL(insertSql);
             i++;
         }
@@ -116,10 +118,7 @@ public abstract class AhibernateHelper<T> extends SQLiteOpenHelper {
     public int update(T object) {
         SQLiteDatabase db = getWritableDatabase();
         int i = -1;
-        String tableName = TableUtils.extractTableName(object.getClass());
-        HashMap<String, String> needUpdate = new HashMap<String, String>();
-        HashMap<String, String> where = new HashMap<String, String>();
-        String updateSql = DataBuilder.buildUpdateSql(tableName, needUpdate, where);
+        String updateSql = new Update(object).toStatementString();
         db.execSQL(updateSql);
         i++;
         return i;
