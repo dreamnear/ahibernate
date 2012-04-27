@@ -183,4 +183,47 @@ public class DataBuilder {
         }
         return sb.toString();
     }
+
+    public static String buildInsertSql(String tableName, Map<String, String> insertColumns) {
+        StringBuilder columns = new StringBuilder(256);
+        StringBuilder values = new StringBuilder(256);
+        columns.append("INSERT INTO ");
+
+        columns.append(tableName).append(" (");
+        values.append("(");
+
+        Iterator iter = insertColumns.entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry e = (Map.Entry) iter.next();
+            columns.append(e.getKey());
+            values.append(e.getValue());
+            if (iter.hasNext()) {
+                columns.append(", ");
+                values.append(", ");
+            }
+        }
+        columns.append(") values ");
+        values.append(")");
+        columns.append(values);
+        return columns.toString();
+    }
+
+    public static String buildSelectSql(String tableName, Map<String, String> where) {
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("SELECT * FROM ");
+        sb.append(tableName);
+        Iterator iter = null;
+        if (where != null) {
+            sb.append(" WHERE ");
+            iter = where.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry e = (Map.Entry) iter.next();
+                sb.append(e.getKey()).append(" = ").append(e.getValue());
+                if (iter.hasNext()) {
+                    sb.append(" AND ");
+                }
+            }
+        }
+        return sb.toString();
+    }
 }
