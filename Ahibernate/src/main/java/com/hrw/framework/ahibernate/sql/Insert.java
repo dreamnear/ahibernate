@@ -12,19 +12,13 @@ import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.builder.DataBuilder;
 import com.hrw.framework.ahibernate.table.TableUtils;
 
-public class Insert {
+public class Insert extends Operate {
 
     private Object entity;
 
-    private String tableName;
-
     public Insert(Object entity) {
+        super(entity.getClass());
         this.entity = entity;
-        this.tableName = TableUtils.extractTableName(entity.getClass());
-    }
-
-    public String getTableName() {
-        return tableName;
     }
 
     public Map<String, String> getInsertColumns() throws IllegalArgumentException,
@@ -57,7 +51,7 @@ public class Insert {
     }
 
     public String toStatementString() throws IllegalArgumentException, IllegalAccessException {
-        return DataBuilder.buildInsertSql(tableName, getInsertColumns());
+        return buildInsertSql(getTableName(), getInsertColumns());
     }
 
 }

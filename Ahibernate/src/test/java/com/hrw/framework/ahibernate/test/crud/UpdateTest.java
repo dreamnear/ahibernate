@@ -47,7 +47,7 @@ public class UpdateTest {
         book.setBookName("testBook");
         Update update = new Update(book);
         Assert.assertNotNull(update.getWhereFiled().get("id"));
-        Assert.assertEquals(EXPECTED_UPDATE_SQL5, update.testToStatementString());
+        Assert.assertEquals(EXPECTED_UPDATE_SQL5, update.toStatementString());
     }
 
     @Test
@@ -59,6 +59,6 @@ public class UpdateTest {
         where.put("name", "2");
         Update update = new Update(book, where);
 
-        Assert.assertEquals(EXPECTED_UPDATE_SQL4, update.testToStatementString());
+        Assert.assertEquals(EXPECTED_UPDATE_SQL4, update.toStatementString());
     }
 }
