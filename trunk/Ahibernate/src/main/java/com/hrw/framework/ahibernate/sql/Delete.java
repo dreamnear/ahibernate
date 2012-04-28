@@ -10,15 +10,19 @@ public class Delete extends Operate {
 
     /**
      * delete entity by id.
+     * 
      * @param entity
+     * @throws Exception
      */
-    public Delete(Object entity) {
+    public Delete(Object entity) throws Exception {
         super(entity.getClass());
         this.entity = entity;
+        this.where = buildWhere(entity);
     }
 
     /**
      * delete entity by where,if where is null it will delete all records.
+     * 
      * @param entity
      * @param where
      */
