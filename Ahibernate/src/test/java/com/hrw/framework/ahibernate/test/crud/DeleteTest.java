@@ -57,17 +57,30 @@ public class DeleteTest {
         try {
             Delete delete = new Delete(book);
         } catch (Exception e) {
-            Assert.assertEquals(null, e.getMessage());
+            Assert.assertEquals("can't delete,entity is illegal", e.getMessage());
         }
     }
 
     @Test
-    public void buildDeleteSuccess() {
+    public void buildDeleteSuccess1() {
         Book book = new Book();
         book.setId(1l);
         try {
             Delete delete = new Delete(book);
             Assert.assertEquals(EXPECTED_DELETE_SQL2, delete.toStatementString());
+        } catch (Exception e) {
+        }
+
+    }
+    
+    @Test
+    public void buildDeleteSuccess2() {
+        Book book = new Book();
+        book.setId(1l);
+        book.setBookName("newbook");
+        try {
+            Delete delete = new Delete(book);
+            Assert.assertEquals(EXPECTED_DELETE_SQL3, delete.toStatementString());
         } catch (Exception e) {
         }
 
