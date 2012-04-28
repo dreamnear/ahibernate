@@ -15,7 +15,7 @@ public class SelectTest {
 
     String EXPECTED_SELECT_SQL2 = "SELECT * FROM book WHERE id = 1";
 
-    String EXPECTED_SELECT_SQL3 = "SELECT * FROM book WHERE id = 1 AND book_name = newbook";
+    String EXPECTED_SELECT_SQL3 = "SELECT * FROM book WHERE id = 1 AND book_name = 'newbook'";
 
     @Test
     public void testGetTableName() {

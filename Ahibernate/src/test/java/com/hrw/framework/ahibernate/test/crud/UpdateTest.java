@@ -11,9 +11,9 @@ import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class UpdateTest {
     // UPDATE null SET id = null, book_name = testBook where id = 1 and name = 2
-    private static String EXPECTED_UPDATE_SQL4 = "UPDATE book SET book_name = testBook where id = 1 and name = 2";
+    private static String EXPECTED_UPDATE_SQL4 = "UPDATE book SET book_name = 'testBook' where id = 1 and name = 2";
 
-    private static String EXPECTED_UPDATE_SQL5 = "UPDATE book SET book_name = testBook where id = 1";
+    private static String EXPECTED_UPDATE_SQL5 = "UPDATE book SET book_name = 'testBook' where id = 1";
     @Test
     public void testGetUpdateFields1() throws IllegalArgumentException, IllegalAccessException {
         Book book = new Book();
