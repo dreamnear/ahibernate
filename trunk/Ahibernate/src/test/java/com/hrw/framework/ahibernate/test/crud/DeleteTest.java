@@ -14,7 +14,7 @@ public class DeleteTest {
 
     private String EXPECTED_DELETE_SQL2 = "DELETE FROM book WHERE id = 1";
 
-    private String EXPECTED_DELETE_SQL3 = "DELETE FROM book WHERE id = 1 AND book_name = newbook";
+    private String EXPECTED_DELETE_SQL3 = "DELETE FROM book WHERE id = 1 AND book_name = 'newbook'";
 
     @Test
     public void testGetTableName() {

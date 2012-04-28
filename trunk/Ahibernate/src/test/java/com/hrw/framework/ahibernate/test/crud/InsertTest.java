@@ -9,7 +9,7 @@ import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class InsertTest {
 
-    private String EXPECTED_INSERT_SQL = "INSERT INTO book (id, book_name) values (1, newbook)";
+    private String EXPECTED_INSERT_SQL = "INSERT INTO book (book_name) values ('newbook')";
 
     @Test
     public void testGetTableName() {
@@ -26,6 +26,7 @@ public class InsertTest {
         Assert.assertEquals("newbook", insert.getInsertColumns().get("book_name"));
     }
 
+    //Id 自动生成，暂时无法设置保存到数据
     @Test
     public void testToStatementString() throws IllegalArgumentException, IllegalAccessException {
         Book book = new Book();
