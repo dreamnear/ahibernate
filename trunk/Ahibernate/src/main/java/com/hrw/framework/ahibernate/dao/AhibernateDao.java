@@ -30,16 +30,18 @@ public class AhibernateDao<T> {
         this.db = db;
     }
 
-    public int insert(T entity) throws SQLException {
+    public int insert(T entity) {
         String sql;
         sql = new Insert(entity).toStatementString();
+        Log.i(TAG, "insert sql:" + sql);
         SQLiteStatement stmt = null;
         try {
             stmt = db.compileStatement(sql);
             long rowId = stmt.executeInsert();
-            return (int) rowId;
+            return 1;
         } catch (android.database.SQLException e) {
-            throw new SQLException("inserting to database failed: " + sql, e);
+            Log.e(TAG, "inserting to database failed: " + sql, e);
+            return -1;
         } finally {
             if (stmt != null) {
                 stmt.close();
