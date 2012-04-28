@@ -168,11 +168,7 @@ public class Operate {
                 for (Annotation annotation : fieldAnnotations) {
                     String columnName = null;
                     if (annotation instanceof Id) {
-                        if (((Id) annotation).autoGenerate()) {
-                            continue;
-                        } else {
-                            columnName = ((Id) annotation).name();
-                        }
+                        columnName = ((Id) annotation).name();
                     } else if (annotation instanceof Column) {
                         columnName = ((Column) annotation).name();
                     } else if (annotation instanceof OneToMany) {
@@ -180,7 +176,7 @@ public class Operate {
                         // Ignore
                     }
                     try {
-                        if (field.get(entity).toString().length() > 0) {
+                        if (null != field.get(entity) && field.get(entity).toString().length() > 0) {
                             where.put((columnName != null && !columnName.equals("")) ? columnName
                                     : field.getName(), field.get(entity).toString());
                         }
