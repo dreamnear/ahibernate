@@ -21,8 +21,7 @@ public class Insert extends Operate {
         this.entity = entity;
     }
 
-    public Map<String, String> getInsertColumns() throws IllegalArgumentException,
-            IllegalAccessException {
+    public Map<String, String> getInsertColumns() {
         Map<String, String> insertColumns = new HashMap<String, String>();
         Class clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
@@ -41,16 +40,25 @@ public class Insert extends Operate {
                         // Ignore
                     }
                     field.setAccessible(true);
-                    insertColumns.put((columnName != null && !columnName.equals("")) ? columnName
-                            : field.getName(), field.get(entity) == null ? null : field.get(entity)
-                            .toString());
+                    try {
+                        insertColumns.put(
+                                (columnName != null && !columnName.equals("")) ? columnName : field
+                                        .getName(),
+                                field.get(entity) == null ? null : field.get(entity).toString());
+                    } catch (IllegalArgumentException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
                 }
             }
         }
         return insertColumns;
     }
 
-    public String toStatementString() throws IllegalArgumentException, IllegalAccessException {
+    public String toStatementString() {
         return buildInsertSql(getTableName(), getInsertColumns());
     }
 
