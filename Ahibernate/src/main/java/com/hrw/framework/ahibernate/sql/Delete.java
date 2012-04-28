@@ -8,11 +8,20 @@ public class Delete extends Operate {
 
     private Map<String, String> where;
 
+    /**
+     * delete entity by id.
+     * @param entity
+     */
     public Delete(Object entity) {
         super(entity.getClass());
         this.entity = entity;
     }
 
+    /**
+     * delete entity by where,if where is null it will delete all records.
+     * @param entity
+     * @param where
+     */
     public Delete(Object entity, Map<String, String> where) {
         super(entity.getClass());
         this.entity = entity;
