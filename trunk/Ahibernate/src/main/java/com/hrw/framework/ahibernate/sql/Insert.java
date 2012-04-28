@@ -32,7 +32,7 @@ public class Insert extends Operate {
                 for (Annotation annotation : fieldAnnotations) {
                     String columnName = null;
                     if (annotation instanceof Id) {
-                        // columnName = ((Id) annotation).name();
+//                         columnName = ((Id) annotation).name();
                         continue;
                         // TODO
                     } else if (annotation instanceof Column) {
