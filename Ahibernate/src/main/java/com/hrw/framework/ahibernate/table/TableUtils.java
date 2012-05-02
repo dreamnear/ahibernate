@@ -4,16 +4,22 @@ package com.hrw.framework.ahibernate.table;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import android.database.sqlite.SQLiteDatabase;
 
 import com.hrw.framework.ahibernate.annotation.Column;
 import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.annotation.Table;
 import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
+import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class TableUtils {
+    public static boolean DEBUG = true;
+
     private static String DEFAULT_FOREIGN_KEY_SUFFIX = "_id";
 
     public static <T> TableInfo extractTableInfo(Class<T> clazz) {
@@ -40,17 +46,6 @@ public class TableUtils {
                             : field.getName(), field);
                 }
             }
-
-            // if (fieldAnnotations.length != 0
-            // && field.getAnnotation(OneToMany.class) == null) {
-            //
-            // if (null != field.getAnnotation(Id.class)) {
-            // columnName = field.getAnnotation(Id.class).name();
-            // }
-            // fieldNameMap.put(
-            // columnName != null ? columnName : field.getName(),
-            // field);
-            // }
         }
         tableInfo.setFieldNameMap(fieldNameMap);
         return tableInfo;
@@ -115,7 +110,7 @@ public class TableUtils {
         return sb.toString();
     }
 
-    public static String buildCreateTableStatements(TableInfo tableInfo, boolean ifNotExists) {
+    public static String buildCreateTableStatement(TableInfo tableInfo, boolean ifNotExists) {
         // CREATE TABLE IF NOT EXISTS hrw_playlist (id INTEGER PRIMARY KEY,name
         // TEXT CHECK( name != '' ),add_date INTEGER,modified_date INTEGER);
         StringBuilder sb = new StringBuilder(256);
@@ -124,34 +119,34 @@ public class TableUtils {
         if (ifNotExists) {
             sb.append("IF NOT EXISTS ");
         }
+
         sb.append(tableInfo.getTableName());
         sb.append(" (");
-        Boolean isFirst = true;
-        Field idFiled = tableInfo.getIdField();
-        for (@SuppressWarnings("rawtypes")
-        // CREATE TABLE book (id INTEGER PRIMARY KEY, , bookName TEXT)
-        Entry entry : tableInfo.getFieldNameMap().entrySet()) {
-            Field f = (Field) entry.getValue();
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sb.append(", ");
-            }
+
+        Iterator iter = null;
+        iter = tableInfo.getFieldNameMap().entrySet().iterator();
+        while (iter.hasNext()) {
+            Map.Entry e = (Map.Entry) iter.next();
+            Field f = (Field) e.getValue();
             if (f.getType().getSimpleName().equals("Long")) {
-                sb.append(entry.getKey() + " INTEGER");
+                sb.append(e.getKey() + " INTEGER");
             }
             // if (f.getType().getSimpleName().equals("List")) {
             // sb.append(entry.getKey()+DEFAULT_FOREIGN_KEY_SUFFIX +
             // " INTEGER");
             // }
             if (f.getType().getSimpleName().equals("String")) {
-                sb.append(entry.getKey() + " TEXT");
+                sb.append(e.getKey() + " TEXT");
             }
+            Field idFiled = tableInfo.getIdField();
             // and primary key here
             if (idFiled != null && idFiled.getName().equals(f.getName())) {
                 sb.append(" PRIMARY KEY");
             }
 
+            if (iter.hasNext()) {
+                sb.append(", ");
+            }
         }
         sb.append(")");
         return sb.toString();
@@ -191,5 +186,17 @@ public class TableUtils {
             }
         }
         return idField;
+    }
+
+    public static <T> int createTable(SQLiteDatabase db, Class<T> entityClass, boolean ifNotExists) {
+        int i = -1;
+        TableInfo tableInfo = extractTableInfo(entityClass);
+        String sql = buildCreateTableStatement(tableInfo, ifNotExists);
+        System.out.println(sql);
+        if (!DEBUG) {
+            db.execSQL(sql);
+        }
+        i = 1;
+        return i;
     }
 }

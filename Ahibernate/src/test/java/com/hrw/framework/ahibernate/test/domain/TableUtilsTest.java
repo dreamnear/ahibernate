@@ -10,7 +10,7 @@ public class TableUtilsTest {
 
 	@Test
 	public void testBuildCreateTableStatements() {
-		String result = TableUtils.buildCreateTableStatements(
+		String result = TableUtils.buildCreateTableStatement(
 				TableUtils.extractTableInfo(Book.class), false);
 		Assert.assertEquals(
 				"CREATE TABLE book (id INTEGER PRIMARY KEY, book_name TEXT)",
