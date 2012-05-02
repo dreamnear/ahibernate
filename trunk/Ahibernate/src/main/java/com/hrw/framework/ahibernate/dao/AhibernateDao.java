@@ -14,8 +14,11 @@ import com.hrw.framework.ahibernate.sql.Delete;
 import com.hrw.framework.ahibernate.sql.Insert;
 import com.hrw.framework.ahibernate.sql.Select;
 import com.hrw.framework.ahibernate.sql.Update;
+import com.hrw.framework.ahibernate.table.TableUtils;
 
 public class AhibernateDao<T> {
+    private static String EMPTY_SQL = "DELETE FROM ";
+
     private SQLiteDatabase db;
 
     private String TAG = "AhibernateDao";
@@ -72,6 +75,22 @@ public class AhibernateDao<T> {
     public void delete(T entity, Map<String, String> where) {
         String sql = new Delete(entity, where).toStatementString();
         Log.d(TAG, "delete sql:" + sql);
+        SQLiteStatement stmt = null;
+        try {
+            stmt = db.compileStatement(sql);
+            stmt.execute();
+        } catch (android.database.SQLException e) {
+            Log.e(TAG, e.getMessage() + " sql:" + sql);
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
+    }
+
+    public void truncate(Class clazz) {
+        String sql = EMPTY_SQL + TableUtils.extractTableName(clazz);
+        Log.d(TAG, "truncate sql:" + sql);
         SQLiteStatement stmt = null;
         try {
             stmt = db.compileStatement(sql);
