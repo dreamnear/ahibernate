@@ -15,14 +15,13 @@ import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.annotation.Table;
 import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
-import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class TableUtils {
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     private static String DEFAULT_FOREIGN_KEY_SUFFIX = "_id";
 
-    public static <T> TableInfo extractTableInfo(Class<T> clazz) {
+    public static TableInfo extractTableInfo(Class clazz) {
         TableInfo tableInfo = new TableInfo();
         tableInfo.setTableName(extractTableName(clazz));
         tableInfo.setIdField(extractIdField(clazz));
@@ -51,13 +50,11 @@ public class TableUtils {
         return tableInfo;
     }
 
-    public static String buildDropTableStatements(TableInfo tableInfo, boolean ifExists) {
+    public static String buildDropTableStatement(TableInfo tableInfo) {
         // DROP TABLE IF EXISTS avpig_tingshu_book
         StringBuilder sb = new StringBuilder(256);
-        sb.append("Drop TABLE ");
-        if (ifExists) {
-            sb.append("IF EXISTS ");
-        }
+        sb.append("DROP TABLE ");
+        sb.append("IF EXISTS ");
         sb.append(tableInfo.getTableName());
         return sb.toString();
     }
@@ -152,8 +149,8 @@ public class TableUtils {
         return sb.toString();
     }
 
-    public static <T> String extractTableName(Class<T> clazz) {
-        Table table = clazz.getAnnotation(Table.class);
+    public static String extractTableName(Class clazz) {
+        Table table = (Table) clazz.getAnnotation(Table.class);
         String name = null;
         if (table != null && table.name() != null && table.name().length() > 0) {
             name = table.name();
@@ -171,7 +168,7 @@ public class TableUtils {
         return name;
     }
 
-    public static <T> Field extractIdField(Class<T> clazz) {
+    public static Field extractIdField(Class clazz) {
         Field idField = null;
         for (Field field : clazz.getDeclaredFields()) {
             if (field.getAnnotations().length != 0) {
@@ -188,15 +185,32 @@ public class TableUtils {
         return idField;
     }
 
-    public static <T> int createTable(SQLiteDatabase db, Class<T> entityClass, boolean ifNotExists) {
+    public static int createTable(SQLiteDatabase db, boolean ifNotExists, Class... entityClasses) {
         int i = -1;
-        TableInfo tableInfo = extractTableInfo(entityClass);
-        String sql = buildCreateTableStatement(tableInfo, ifNotExists);
-        System.out.println(sql);
-        if (!DEBUG) {
-            db.execSQL(sql);
+        for (Class clazz : entityClasses) {
+            TableInfo tableInfo = extractTableInfo(clazz);
+            String sql = buildCreateTableStatement(tableInfo, ifNotExists);
+            System.out.println(sql);
+            if (!DEBUG) {
+                db.execSQL(sql);
+            }
+            i = 1;
         }
-        i = 1;
+
+        return i;
+    }
+
+    public static int dropTable(SQLiteDatabase db, Class... entityClasses) {
+        int i = -1;
+        for (Class clazz : entityClasses) {
+            TableInfo tableInfo = extractTableInfo(clazz);
+            String sql = buildDropTableStatement(tableInfo);
+            System.out.println(sql);
+            if (!DEBUG) {
+                db.execSQL(sql);
+            }
+            i = 1;
+        }
         return i;
     }
 }

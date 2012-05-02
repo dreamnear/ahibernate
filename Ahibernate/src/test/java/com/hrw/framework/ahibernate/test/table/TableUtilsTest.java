@@ -13,7 +13,12 @@ public class TableUtilsTest {
     @Test
     public void testCreateTable() {
         SQLiteDatabase db = null;
-        Assert.assertEquals(1, TableUtils.createTable(db, Book.class, true));
+        Assert.assertEquals(1, TableUtils.createTable(db, true, Book.class));
     }
 
+    @Test
+    public void testDropTable() {
+        SQLiteDatabase db = null;
+        Assert.assertEquals(1, TableUtils.dropTable(db, Book.class));
+    }
 }

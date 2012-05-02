@@ -72,8 +72,8 @@ public abstract class AhibernateSQLiteOpenHelper<T> extends SQLiteOpenHelper {
     public void dropTableStatements(Class... clazzs) {
         Class[] clazzss = clazzs;
         for (Class clazz : clazzss) {
-            buildTableStatements.add(TableUtils.buildDropTableStatements(
-                    TableUtils.extractTableInfo(clazz), true));
+            buildTableStatements.add(TableUtils.buildDropTableStatement(TableUtils
+                    .extractTableInfo(clazz)));
         }
     }
 
