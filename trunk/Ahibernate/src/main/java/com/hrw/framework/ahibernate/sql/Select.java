@@ -3,9 +3,6 @@ package com.hrw.framework.ahibernate.sql;
 
 import java.util.Map;
 
-import com.hrw.framework.ahibernate.builder.DataBuilder;
-import com.hrw.framework.ahibernate.table.TableUtils;
-
 public class Select extends Operate {
     private Object entity;
 
