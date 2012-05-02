@@ -33,7 +33,7 @@ public class AhibernateDao<T> {
     public int insert(T entity) {
         String sql;
         sql = new Insert(entity).toStatementString();
-        Log.i(TAG, "insert sql:" + sql);
+        Log.d(TAG, "insert sql:" + sql);
         SQLiteStatement stmt = null;
         try {
             stmt = db.compileStatement(sql);
@@ -51,6 +51,7 @@ public class AhibernateDao<T> {
 
     public List<T> queryList(T entity, Map<String, String> where) {
         String sql = new Select(entity, where).toStatementString();
+        Log.d(TAG, "query sql:"+sql);
         List<T> queryList = new ArrayList<T>();
         Cursor cursor = db.rawQuery(sql, null);
         Class clazz = entity.getClass();
@@ -109,6 +110,7 @@ public class AhibernateDao<T> {
 
     public void update(T entity, Map<String, String> where) {
         String sql = new Update(entity, where).toStatementString();
+        Log.d(TAG, "update sql:"+sql);
         SQLiteStatement stmt = null;
         try {
             stmt = db.compileStatement(sql);
@@ -124,6 +126,7 @@ public class AhibernateDao<T> {
 
     public void delete(T entity, Map<String, String> where) {
         String sql = new Delete(entity, where).toStatementString();
+        Log.d(TAG, "delete sql:"+sql);
         SQLiteStatement stmt = null;
         try {
             stmt = db.compileStatement(sql);
