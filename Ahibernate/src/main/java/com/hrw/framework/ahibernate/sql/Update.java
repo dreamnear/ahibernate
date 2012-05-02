@@ -9,8 +9,6 @@ import java.util.Map;
 import com.hrw.framework.ahibernate.annotation.Column;
 import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
-import com.hrw.framework.ahibernate.builder.DataBuilder;
-import com.hrw.framework.ahibernate.table.TableUtils;
 
 public class Update extends Operate {
     private Object entity;
