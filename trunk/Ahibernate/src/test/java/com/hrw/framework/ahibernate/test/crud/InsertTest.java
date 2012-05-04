@@ -11,6 +11,8 @@ public class InsertTest {
 
     private String EXPECTED_INSERT_SQL = "INSERT INTO book (book_name) values ('newbook')";
 
+    private String EXPECTED_INSERT_SQL1 = "INSERT INTO book (book_name) values (null)";
+
     @Test
     public void testGetTableName() {
         Book book = new Book();
@@ -26,14 +28,23 @@ public class InsertTest {
         Assert.assertEquals("newbook", insert.getInsertColumns().get("book_name"));
     }
 
-    //Id 自动生成，暂时无法设置保存到数据
+    // Id 自动生成，暂时无法设置保存到数据
     @Test
-    public void testToStatementString() throws IllegalArgumentException, IllegalAccessException {
+    public void testToStatementString1() throws IllegalArgumentException, IllegalAccessException {
         Book book = new Book();
         book.setBookName("newbook");
         book.setId(1L);
         Insert insert = new Insert(book);
         Assert.assertEquals(EXPECTED_INSERT_SQL, insert.toStatementString());
+    }
+
+    @Test
+    public void testToStatementString2() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
+        book.setBookName(null);
+        book.setId(1L);
+        Insert insert = new Insert(book);
+        Assert.assertEquals(EXPECTED_INSERT_SQL1, insert.toStatementString());
     }
 
 }

@@ -89,8 +89,8 @@ public class Operate {
         while (iter.hasNext()) {
             Map.Entry e = (Map.Entry) iter.next();
             columns.append(e.getKey());
-            values.append(isNumeric(e.getValue().toString()) ? e.getValue() : "'" + e.getValue()
-                    + "'");
+            values.append(isNumeric(e.getValue() != null ? e.getValue().toString() : "") ? e
+                    .getValue() : "'" + e.getValue() + "'");
             if (iter.hasNext()) {
                 columns.append(", ");
                 values.append(", ");
