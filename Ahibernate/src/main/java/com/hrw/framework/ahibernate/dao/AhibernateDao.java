@@ -73,7 +73,12 @@ public class AhibernateDao<T> {
     }
 
     public void delete(T entity, Map<String, String> where) {
-        String sql = new Delete(entity, where).toStatementString();
+        String sql = null;
+        if (null == where) {
+            sql = new Delete(entity).toStatementString();
+        } else {
+            sql = new Delete(entity, where).toStatementString();
+        }
         Log.d(TAG, "delete sql:" + sql);
         SQLiteStatement stmt = null;
         try {

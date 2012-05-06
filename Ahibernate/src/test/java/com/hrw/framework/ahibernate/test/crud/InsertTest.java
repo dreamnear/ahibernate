@@ -9,9 +9,9 @@ import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class InsertTest {
 
-    private String EXPECTED_INSERT_SQL = "INSERT INTO book (book_name) values ('newbook')";
+    private String EXPECTED_INSERT_SQL = "INSERT INTO book (id, book_name) values (1, 'newbook')";
 
-    private String EXPECTED_INSERT_SQL1 = "INSERT INTO book (book_name) values (null)";
+    private String EXPECTED_INSERT_SQL1 = "INSERT INTO book (id, book_name) values (1, null)";
 
     @Test
     public void testGetTableName() {
