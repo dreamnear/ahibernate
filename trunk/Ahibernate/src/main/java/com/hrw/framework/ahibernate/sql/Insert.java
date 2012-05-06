@@ -29,9 +29,9 @@ public class Insert extends Operate {
             if (fieldAnnotations.length != 0) {
                 for (Annotation annotation : fieldAnnotations) {
                     String columnName = null;
-                    if (annotation instanceof Id) {
-//                         columnName = ((Id) annotation).name();
-                        continue;
+                    if (annotation instanceof Id && !((Id)annotation).autoGenerate()) {
+                         columnName = ((Id) annotation).name();
+//                        continue;
                         // TODO
                     } else if (annotation instanceof Column) {
                         columnName = ((Column) annotation).name();

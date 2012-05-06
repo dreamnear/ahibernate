@@ -12,5 +12,5 @@ import java.lang.annotation.Target;
 public @interface Id {
 	String name() default "";
 
-	boolean autoGenerate() default true;
+	boolean autoGenerate() default false;
 }

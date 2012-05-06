@@ -14,10 +14,15 @@ public class Delete extends Operate {
      * @param entity
      * @throws Exception
      */
-    public Delete(Object entity) throws Exception {
+    public Delete(Object entity) {
         super(entity.getClass());
         this.entity = entity;
-        this.where = buildWhere(entity);
+        try {
+            this.where = buildWhere(entity);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
