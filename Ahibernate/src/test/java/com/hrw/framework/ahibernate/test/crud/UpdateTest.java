@@ -64,4 +64,15 @@ public class UpdateTest {
 
         Assert.assertEquals(EXPECTED_UPDATE_SQL4, update.toStatementString());
     }
+
+    @Test
+    public void testToStatementStringFail() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
+        try {
+            Update update = new Update(book);
+        } catch (Exception e) {
+            Assert.assertEquals("can't delete,entity is illegal", e.getMessage());
+        }
+
+    }
 }
