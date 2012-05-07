@@ -50,7 +50,7 @@ public class UpdateTest {
         book.setBookName("testBook");
         Update update = new Update(book);
         Assert.assertNotNull(update.getWhereFiled().get("id"));
-        Assert.assertEquals(EXPECTED_UPDATE_SQL6, update.toStatementString());
+        Assert.assertEquals(EXPECTED_UPDATE_SQL5, update.toStatementString());
     }
 
     @Test

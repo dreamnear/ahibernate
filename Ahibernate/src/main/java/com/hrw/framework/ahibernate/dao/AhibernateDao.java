@@ -46,11 +46,22 @@ public class AhibernateDao<T> {
         }
     }
 
-    public List<T> queryList(T entity, Map<String, String> where) {
-        String sql = new Select(entity, where).toStatementString();
+    @SuppressWarnings("rawtypes")
+    public List<T> queryList(Class clazz, Map<String, String> where) {
+        String sql = new Select(clazz, where).toStatementString();
         Log.d(TAG, "query sql:" + sql);
         Cursor cursor = db.rawQuery(sql, null);
-        EntityBuilder<T> builder = new EntityBuilder<T>(entity, cursor);
+        EntityBuilder<T> builder = new EntityBuilder<T>(clazz, cursor);
+        List<T> queryList = builder.buildQueryList();
+        cursor.close();
+        return queryList;
+    }
+
+    public List<T> queryList(T entity) {
+        String sql = new Select(entity).toStatementString();
+        Log.d(TAG, "query sql:" + sql);
+        Cursor cursor = db.rawQuery(sql, null);
+        EntityBuilder<T> builder = new EntityBuilder<T>(entity.getClass(), cursor);
         List<T> queryList = builder.buildQueryList();
         cursor.close();
         return queryList;
@@ -72,12 +83,12 @@ public class AhibernateDao<T> {
         }
     }
 
-    public void delete(T entity, Map<String, String> where) {
+    public void delete(Class clazz, Map<String, String> where) {
         String sql = null;
         if (null == where) {
-            sql = new Delete(entity).toStatementString();
+            sql = new Delete(clazz).toStatementString();
         } else {
-            sql = new Delete(entity, where).toStatementString();
+            sql = new Delete(clazz, where).toStatementString();
         }
         Log.d(TAG, "delete sql:" + sql);
         SQLiteStatement stmt = null;
@@ -96,6 +107,23 @@ public class AhibernateDao<T> {
     public void truncate(Class clazz) {
         String sql = EMPTY_SQL + TableUtils.extractTableName(clazz);
         Log.d(TAG, "truncate sql:" + sql);
+        SQLiteStatement stmt = null;
+        try {
+            stmt = db.compileStatement(sql);
+            stmt.execute();
+        } catch (android.database.SQLException e) {
+            Log.e(TAG, e.getMessage() + " sql:" + sql);
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
+    }
+
+    public void delete(T entity) {
+        String sql = null;
+        sql = new Delete(entity).toStatementString();
+        Log.d(TAG, "delete sql:" + sql);
         SQLiteStatement stmt = null;
         try {
             stmt = db.compileStatement(sql);

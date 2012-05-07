@@ -31,9 +31,9 @@ public class Delete extends Operate {
      * @param entity
      * @param where
      */
-    public Delete(Object entity, Map<String, String> where) {
-        super(entity.getClass());
-        this.entity = entity;
+    @SuppressWarnings("rawtypes")
+    public Delete(Class clazz, Map<String, String> where) {
+        super(clazz);
         this.where = where;
     }
 

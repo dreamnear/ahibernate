@@ -37,17 +37,16 @@ public class DeleteTest {
         Book book = new Book();
         HashMap<String, String> where = new HashMap<String, String>();
         where.put("id", "1");
-        Delete update = new Delete(book, where);
+        Delete update = new Delete(Book.class, where);
         Assert.assertEquals(EXPECTED_DELETE_SQL2, update.toStatementString());
     }
 
     @Test
     public void toStatementString3() {
-        Book book = new Book();
         HashMap<String, String> where = new HashMap<String, String>();
         where.put("id", "1");
         where.put("book_name", "newbook");
-        Delete update = new Delete(book, where);
+        Delete update = new Delete(Book.class, where);
         Assert.assertEquals(EXPECTED_DELETE_SQL3, update.toStatementString());
     }
 

@@ -19,7 +19,7 @@ public class Update extends Operate {
         super(entity.getClass());
         this.entity = entity;
         try {
-            this.where = buildWhere(entity);
+            this.where = getDefaultWhereField();
         } catch (Exception e) {
             this.where = null;
             e.printStackTrace();

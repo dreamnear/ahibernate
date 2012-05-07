@@ -13,18 +13,17 @@ import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
 
 public class EntityBuilder<T> {
-    private T entity;
+    private Class clazz;
 
     private Cursor cursor;
 
-    public EntityBuilder(T entity, Cursor cursor) {
-        this.entity = entity;
+    public EntityBuilder(Class clazz, Cursor cursor) {
+        this.clazz = clazz;
         this.cursor = cursor;
     }
 
     public List<T> buildQueryList() {
         List<T> queryList = new ArrayList<T>();
-        Class clazz = entity.getClass();
         Field[] fields = clazz.getDeclaredFields();
         if (cursor.moveToFirst()) {
             for (int i = 0; i < cursor.getCount(); i++) {
