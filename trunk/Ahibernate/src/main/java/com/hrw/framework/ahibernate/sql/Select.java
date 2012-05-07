@@ -19,9 +19,8 @@ public class Select extends Operate {
         }
     }
 
-    public Select(Object entity, Map<String, String> where) {
-        super(entity.getClass());
-        this.entity = entity;
+    public Select(Class clazz, Map<String, String> where) {
+        super(clazz);
         this.where = where;
     }
 

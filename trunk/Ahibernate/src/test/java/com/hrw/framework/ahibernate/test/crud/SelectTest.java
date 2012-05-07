@@ -68,20 +68,18 @@ public class SelectTest {
 
     @Test
     public void testToStatementString5() throws IllegalArgumentException, IllegalAccessException {
-        Book book = new Book();
         Map<String, String> where = new HashMap<String, String>();
         where.put("id", "1");
-        Select select = new Select(book, where);
+        Select select = new Select(Book.class, where);
         Assert.assertEquals(EXPECTED_SELECT_SQL2, select.toStatementString());
     }
 
     @Test
     public void testToStatementString6() throws IllegalArgumentException, IllegalAccessException {
-        Book book = new Book();
         Map<String, String> where = new HashMap<String, String>();
         where.put("id", "1");
         where.put("book_name", "newbook");
-        Select select = new Select(book, where);
+        Select select = new Select(Book.class, where);
         Assert.assertEquals(EXPECTED_SELECT_SQL3, select.toStatementString());
     }
 }
