@@ -11,6 +11,12 @@ public class Select extends Operate {
     public Select(Object entity) {
         super(entity.getClass());
         this.entity = entity;
+        try {
+            this.where = buildWhere(entity);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public Select(Object entity, Map<String, String> where) {

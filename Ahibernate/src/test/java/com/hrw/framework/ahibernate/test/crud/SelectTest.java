@@ -34,14 +34,49 @@ public class SelectTest {
     @Test
     public void testToStatementString2() throws IllegalArgumentException, IllegalAccessException {
         Book book = new Book();
+        book.setId(1L);
+        Select select = new Select(book);
+        Assert.assertEquals(EXPECTED_SELECT_SQL2, select.toStatementString());
+    }
+
+    @Test
+    public void testToStatementString3() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
+        book.setId(1L);
+        Select select = new Select(book);
+        Assert.assertEquals(EXPECTED_SELECT_SQL2, select.toStatementString());
+    }
+
+    @Test
+    public void testToStatementString4() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
+        book.setId(1L);
+        book.setBookName("newbook");
+        Select select = new Select(book);
+        Assert.assertEquals(EXPECTED_SELECT_SQL3, select.toStatementString());
+    }
+
+    @Test
+    public void testToStatementStringFail() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
+        try {
+            Select select = new Select(book);
+        } catch (Exception e) {
+            Assert.assertEquals("can't delete,entity is illegal", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testToStatementString5() throws IllegalArgumentException, IllegalAccessException {
+        Book book = new Book();
         Map<String, String> where = new HashMap<String, String>();
         where.put("id", "1");
         Select select = new Select(book, where);
         Assert.assertEquals(EXPECTED_SELECT_SQL2, select.toStatementString());
     }
-    
+
     @Test
-    public void testToStatementString3() throws IllegalArgumentException, IllegalAccessException {
+    public void testToStatementString6() throws IllegalArgumentException, IllegalAccessException {
         Book book = new Book();
         Map<String, String> where = new HashMap<String, String>();
         where.put("id", "1");

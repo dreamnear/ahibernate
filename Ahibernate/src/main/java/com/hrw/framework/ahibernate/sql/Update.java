@@ -19,11 +19,10 @@ public class Update extends Operate {
         super(entity.getClass());
         this.entity = entity;
         try {
-            this.where = getDefaultWhereField();
-        } catch (IllegalArgumentException e) {
+            this.where = buildWhere(entity);
+        } catch (Exception e) {
             this.where = null;
-        } catch (IllegalAccessException e) {
-            this.where = null;
+            e.printStackTrace();
         }
     }
 
@@ -72,7 +71,8 @@ public class Update extends Operate {
             if (fieldAnnotations.length != 0) {
                 for (Annotation annotation : fieldAnnotations) {
                     String columnName = null;
-                    if (annotation instanceof Id) {
+                    if (annotation instanceof Id && !((Id)annotation).autoGenerate()) {
+                        columnName = ((Id) annotation).name();
                         // do not update id.default primary key
                         // columnName = ((Id) annotation).name();
                         continue;
