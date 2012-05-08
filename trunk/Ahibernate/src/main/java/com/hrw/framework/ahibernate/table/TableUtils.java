@@ -3,10 +3,11 @@ package com.hrw.framework.ahibernate.table;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -14,44 +15,13 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.hrw.framework.ahibernate.annotation.Column;
 import com.hrw.framework.ahibernate.annotation.Id;
-import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.annotation.Table;
 import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
-import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class TableUtils {
     public static boolean DEBUG = false;
 
     private static String DEFAULT_FOREIGN_KEY_SUFFIX = "_id";
-
-    public static TableInfo extractTableInfo(Class clazz) {
-        TableInfo tableInfo = new TableInfo(clazz);
-        tableInfo.setTableName(extractTableName(clazz));
-        tableInfo.setIdField(extractIdField(clazz));
-        Field[] fields = clazz.getDeclaredFields();
-        Map<String, Field> fieldNameMap = new HashMap<String, Field>();
-        Annotation[] fieldAnnotations = null;
-        for (Field field : fields) {
-            fieldAnnotations = field.getAnnotations();
-            if (fieldAnnotations.length != 0) {
-                for (Annotation annotation : fieldAnnotations) {
-                    String columnName = null;
-                    if (annotation instanceof Id) {
-                        columnName = ((Id) annotation).name();
-                    } else if (annotation instanceof Column) {
-                        columnName = ((Column) annotation).name();
-                    } else if (annotation instanceof OneToMany) {
-                        continue;
-                        // Ignore
-                    }
-                    fieldNameMap.put((columnName != null && !columnName.equals("")) ? columnName
-                            : field.getName(), field);
-                }
-            }
-        }
-        tableInfo.setFieldNameMap(fieldNameMap);
-        return tableInfo;
-    }
 
     public static String buildDropTableStatement(TableInfo tableInfo) {
         // DROP TABLE IF EXISTS avpig_tingshu_book
@@ -82,34 +52,6 @@ public class TableUtils {
         return sb.toString();
     }
 
-    // Strubg INSERT = "insert into myTable(date, time, cost) values (?,?,?)";
-    public static String buildInsertTableStatements(TableInfo tableInfo) {
-        // DROP TABLE IF EXISTS avpig_tingshu_book
-        StringBuilder sb = new StringBuilder(256);
-        StringBuilder sbValues = new StringBuilder(256);
-        sb.append("INSERT INTO ");
-        sb.append(tableInfo.getTableName());
-        sb.append(" (");
-        sbValues.append(" (");
-        Boolean isFirst = true;
-        for (@SuppressWarnings("rawtypes")
-        Entry entry : tableInfo.getFieldNameMap().entrySet()) {
-            if (isFirst) {
-                isFirst = false;
-            } else {
-                sb.append(", ");
-                sbValues.append(", ");
-            }
-            sb.append(entry.getKey());
-            sbValues.append("?");
-        }
-        sb.append(")");
-        sbValues.append(")");
-        sb.append(" values");
-        sb.append(sbValues);
-        return sb.toString();
-    }
-
     public static String buildCreateTableStatement(TableInfo tableInfo, boolean ifNotExists) {
         // CREATE TABLE IF NOT EXISTS hrw_playlist (id INTEGER PRIMARY KEY,name
         // TEXT CHECK( name != '' ),add_date INTEGER,modified_date INTEGER);
@@ -128,14 +70,14 @@ public class TableUtils {
         while (iter.hasNext()) {
             Map.Entry e = (Map.Entry) iter.next();
             if (tableInfo.getColumnsType().get(e.getKey()).equals("Long")) {
-                sb.append(e.getKey() + " INTEGER");
+                sb.append(e.getValue() + " INTEGER");
             }
             // if (f.getType().getSimpleName().equals("List")) {
             // sb.append(entry.getKey()+DEFAULT_FOREIGN_KEY_SUFFIX +
             // " INTEGER");
             // }
             if (tableInfo.getColumnsType().get(e.getKey()).equals("String")) {
-                sb.append(e.getKey() + " TEXT");
+                sb.append(e.getValue() + " TEXT");
             }
             // and primary key here
             if (tableInfo.getPrimaryColoum().equals(e.getKey())) {
@@ -189,7 +131,7 @@ public class TableUtils {
     public static int createTable(SQLiteDatabase db, boolean ifNotExists, Class... entityClasses) {
         int i = -1;
         for (Class clazz : entityClasses) {
-            TableInfo tableInfo = extractTableInfo(clazz);
+            TableInfo tableInfo = new TableInfo(clazz);
             String sql = buildCreateTableStatement(tableInfo, ifNotExists);
             if (!DEBUG) {
                 db.execSQL(sql);
@@ -203,7 +145,7 @@ public class TableUtils {
     public static int dropTable(SQLiteDatabase db, Class... entityClasses) {
         int i = -1;
         for (Class clazz : entityClasses) {
-            TableInfo tableInfo = extractTableInfo(clazz);
+            TableInfo tableInfo = new TableInfo(clazz);
             String sql = buildDropTableStatement(tableInfo);
             if (!DEBUG) {
                 db.execSQL(sql);
@@ -255,6 +197,45 @@ public class TableUtils {
             }
         }
         return columns;
+    }
+
+    public static List<Object> extratToTableInfo(Class clazz) {
+        List<Object> tableInfo = new ArrayList<Object>();
+        String tableName = getTableName(clazz);
+        String primaryKey = null;
+        Map<String, String> columns = new HashMap<String, String>();
+        Map<String, String> columnsType = new HashMap<String, String>();
+
+        Annotation[] fieldAnnotations = null;
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            fieldAnnotations = field.getAnnotations();
+            if (fieldAnnotations.length != 0) {
+                for (Annotation annotation : fieldAnnotations) {
+                    String columnName = null;
+                    if (annotation instanceof Id) {
+
+                        primaryKey = field.getName();
+
+                        columnName = ((Id) annotation).name();
+                        columns.put(field.getName(), !StringUtils.isBlank(columnName) ? columnName
+                                : field.getName());
+                        columnsType.put(field.getName(), field.getType().getSimpleName());
+                    } else if (annotation instanceof Column) {
+                        columnName = ((Column) annotation).name();
+                        columns.put(field.getName(), !StringUtils.isBlank(columnName) ? columnName
+                                : field.getName());
+                        columnsType.put(field.getName(), field.getType().getSimpleName());
+                    }
+
+                }
+            }
+        }
+        tableInfo.add(tableName);
+        tableInfo.add(primaryKey);
+        tableInfo.add(columns);
+        tableInfo.add(columnsType);
+        return tableInfo;
     }
 
     public static Map<String, String> getTableColumnsType(Class clazz) {

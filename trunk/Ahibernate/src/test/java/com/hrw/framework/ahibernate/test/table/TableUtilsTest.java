@@ -4,8 +4,6 @@ package com.hrw.framework.ahibernate.test.table;
 import org.junit.Assert;
 import org.junit.Test;
 
-import android.database.sqlite.SQLiteDatabase;
-
 import com.hrw.framework.ahibernate.table.TableInfo;
 import com.hrw.framework.ahibernate.table.TableUtils;
 import com.hrw.framework.ahibernate.test.domain.Book;
@@ -32,15 +30,15 @@ public class TableUtilsTest {
         Assert.assertEquals("Long", TableUtils.getTableColumnsType(Book.class).get("id"));
     }
 
-    // @Test
+    @Test
     public void testCreateTable() {
         TableInfo tableInfo = new TableInfo(Book.class);
-        Assert.assertEquals(1, TableUtils.buildCreateTableStatement(tableInfo, true));
+        Assert.assertEquals("CREATE TABLE IF NOT EXISTS book (id INTEGER PRIMARY KEY, book_name TEXT)", TableUtils.buildCreateTableStatement(tableInfo, true));
     }
 
-    // @Test
+    @Test
     public void testDropTable() {
-        SQLiteDatabase db = null;
-        Assert.assertEquals(1, TableUtils.dropTable(db, Book.class));
+        TableInfo tableInfo = new TableInfo(Book.class);
+        Assert.assertEquals("DROP TABLE IF EXISTS book", TableUtils.buildDropTableStatement(tableInfo));
     }
 }
