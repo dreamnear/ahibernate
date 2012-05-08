@@ -13,6 +13,7 @@ public class TableInfoTest {
         TableInfo tableInfo = new TableInfo(Book.class);
         Assert.assertEquals("book", tableInfo.getTableName());
         Assert.assertEquals("book_name", tableInfo.getColumns().get("bookName"));
+        Assert.assertEquals("String", tableInfo.getColumnsType().get("bookName"));
     }
 
 }
