@@ -1,11 +1,10 @@
 
 package com.hrw.framework.ahibernate.table;
 
-import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 
 public class TableInfo {
-    private Object target;
 
     private Map<String, String> columns;
 
@@ -15,43 +14,17 @@ public class TableInfo {
 
     private String primaryKey;
 
-    private Field idField;
-
-    private Map<String, Field> fieldNameMap;
-
     public TableInfo(Class clazz) {
-        this.tableName = TableUtils.getTableName(clazz);
-        this.columns = TableUtils.getTableColumns(clazz);
-        this.columnsType = TableUtils.getTableColumnsType(clazz);
-        this.primaryKey = TableUtils.getPrimaryKey(clazz);
+        List<Object> tableInfo = TableUtils.extratToTableInfo(clazz);
+        this.tableName = (String) tableInfo.get(0);
+        this.primaryKey = (String) tableInfo.get(1);
+        this.columns = (Map<String, String>) tableInfo.get(2);
+        this.columnsType = (Map<String, String>) tableInfo.get(3);
+
     }
 
     public String getTableName() {
         return tableName;
-    }
-
-    public Field getIdField() {
-        return idField;
-    }
-
-    public Object getTarget() {
-        return target;
-    }
-
-    public void setTarget(Object target) {
-        this.target = target;
-    }
-
-    public void setIdField(Field idField) {
-        this.idField = idField;
-    }
-
-    public Map<String, Field> getFieldNameMap() {
-        return fieldNameMap;
-    }
-
-    public void setFieldNameMap(Map<String, Field> fieldNameMap) {
-        this.fieldNameMap = fieldNameMap;
     }
 
     public void setTableName(String tableName) {
