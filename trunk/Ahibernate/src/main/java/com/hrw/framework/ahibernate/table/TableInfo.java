@@ -2,7 +2,6 @@
 package com.hrw.framework.ahibernate.table;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
 
 public class TableInfo {
@@ -10,7 +9,11 @@ public class TableInfo {
 
     private Map<String, String> columns;
 
+    private Map<String, String> columnsType;
+
     private String tableName;
+
+    private String primaryKey;
 
     private Field idField;
 
@@ -19,6 +22,8 @@ public class TableInfo {
     public TableInfo(Class clazz) {
         this.tableName = TableUtils.getTableName(clazz);
         this.columns = TableUtils.getTableColumns(clazz);
+        this.columnsType = TableUtils.getTableColumnsType(clazz);
+        this.primaryKey = TableUtils.getPrimaryKey(clazz);
     }
 
     public String getTableName() {
@@ -55,6 +60,14 @@ public class TableInfo {
 
     public Map<String, String> getColumns() {
         return this.columns;
+    }
+
+    public Map<String, String> getColumnsType() {
+        return this.columnsType;
+    }
+
+    public String getPrimaryColoum() {
+        return primaryKey;
     }
 
 }

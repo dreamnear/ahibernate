@@ -17,6 +17,7 @@ import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
 import com.hrw.framework.ahibernate.annotation.Table;
 import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
+import com.hrw.framework.ahibernate.test.domain.Book;
 
 public class TableUtils {
     public static boolean DEBUG = false;
@@ -123,23 +124,21 @@ public class TableUtils {
         sb.append(" (");
 
         Iterator iter = null;
-        iter = tableInfo.getFieldNameMap().entrySet().iterator();
+        iter = tableInfo.getColumns().entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry e = (Map.Entry) iter.next();
-            Field f = (Field) e.getValue();
-            if (f.getType().getSimpleName().equals("Long")) {
+            if (tableInfo.getColumnsType().get(e.getKey()).equals("Long")) {
                 sb.append(e.getKey() + " INTEGER");
             }
             // if (f.getType().getSimpleName().equals("List")) {
             // sb.append(entry.getKey()+DEFAULT_FOREIGN_KEY_SUFFIX +
             // " INTEGER");
             // }
-            if (f.getType().getSimpleName().equals("String")) {
+            if (tableInfo.getColumnsType().get(e.getKey()).equals("String")) {
                 sb.append(e.getKey() + " TEXT");
             }
-            Field idFiled = tableInfo.getIdField();
             // and primary key here
-            if (idFiled != null && idFiled.getName().equals(f.getName())) {
+            if (tableInfo.getPrimaryColoum().equals(e.getKey())) {
                 sb.append(" PRIMARY KEY");
             }
 
@@ -244,14 +243,51 @@ public class TableUtils {
                     String columnName = null;
                     if (annotation instanceof Id) {
                         columnName = ((Id) annotation).name();
+                        columns.put(field.getName(), !StringUtils.isBlank(columnName) ? columnName
+                                : field.getName());
                     } else if (annotation instanceof Column) {
                         columnName = ((Column) annotation).name();
+                        columns.put(field.getName(), !StringUtils.isBlank(columnName) ? columnName
+                                : field.getName());
                     }
-                    columns.put(field.getName(), !StringUtils.isBlank(columnName) ? columnName
-                            : field.getName());
+
                 }
             }
         }
         return columns;
     }
+
+    public static Map<String, String> getTableColumnsType(Class clazz) {
+        Map<String, String> columnsType = new HashMap<String, String>();
+        Annotation[] fieldAnnotations = null;
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            fieldAnnotations = field.getAnnotations();
+            if (fieldAnnotations.length != 0) {
+                for (Annotation annotation : fieldAnnotations) {
+                    if (annotation instanceof Id || annotation instanceof Column) {
+                        columnsType.put(field.getName(), field.getType().getSimpleName());
+                    }
+                }
+            }
+        }
+        return columnsType;
+    }
+
+    public static String getPrimaryKey(Class clazz) {
+        Annotation[] fieldAnnotations = null;
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            fieldAnnotations = field.getAnnotations();
+            if (fieldAnnotations.length != 0) {
+                for (Annotation annotation : fieldAnnotations) {
+                    if (annotation instanceof Id) {
+                        return field.getName();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
 }
