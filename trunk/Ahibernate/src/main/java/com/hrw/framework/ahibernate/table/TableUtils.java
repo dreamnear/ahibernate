@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
+
 import android.database.sqlite.SQLiteDatabase;
 
 import com.hrw.framework.ahibernate.annotation.Column;
@@ -22,7 +24,7 @@ public class TableUtils {
     private static String DEFAULT_FOREIGN_KEY_SUFFIX = "_id";
 
     public static TableInfo extractTableInfo(Class clazz) {
-        TableInfo tableInfo = new TableInfo();
+        TableInfo tableInfo = new TableInfo(clazz);
         tableInfo.setTableName(extractTableName(clazz));
         tableInfo.setIdField(extractIdField(clazz));
         Field[] fields = clazz.getDeclaredFields();
@@ -190,7 +192,6 @@ public class TableUtils {
         for (Class clazz : entityClasses) {
             TableInfo tableInfo = extractTableInfo(clazz);
             String sql = buildCreateTableStatement(tableInfo, ifNotExists);
-            System.out.println(sql);
             if (!DEBUG) {
                 db.execSQL(sql);
             }
@@ -205,12 +206,52 @@ public class TableUtils {
         for (Class clazz : entityClasses) {
             TableInfo tableInfo = extractTableInfo(clazz);
             String sql = buildDropTableStatement(tableInfo);
-            System.out.println(sql);
             if (!DEBUG) {
                 db.execSQL(sql);
             }
             i = 1;
         }
         return i;
+    }
+
+    @SuppressWarnings({
+            "rawtypes", "unchecked"
+    })
+    public static String getTableName(Class clazz) {
+        Table table = (Table) clazz.getAnnotation(Table.class);
+        String name = null;
+        if (isTableNameEmpty(table)) {
+            name = table.name();
+        } else {
+            // if the name isn't specified, it is the class name lowercased
+            name = clazz.getSimpleName().toLowerCase();
+        }
+        return name;
+    }
+
+    private static boolean isTableNameEmpty(Table table) {
+        return table != null && StringUtils.isBlank(table.name());
+    }
+
+    public static Map<String, String> getTableColumns(Class clazz) {
+        Map<String, String> columns = new HashMap<String, String>();
+        Annotation[] fieldAnnotations = null;
+        Field[] fields = clazz.getDeclaredFields();
+        for (Field field : fields) {
+            fieldAnnotations = field.getAnnotations();
+            if (fieldAnnotations.length != 0) {
+                for (Annotation annotation : fieldAnnotations) {
+                    String columnName = null;
+                    if (annotation instanceof Id) {
+                        columnName = ((Id) annotation).name();
+                    } else if (annotation instanceof Column) {
+                        columnName = ((Column) annotation).name();
+                    }
+                    columns.put(field.getName(), !StringUtils.isBlank(columnName) ? columnName
+                            : field.getName());
+                }
+            }
+        }
+        return columns;
     }
 }
