@@ -171,7 +171,7 @@ public class TableUtils {
     }
 
     private static boolean isTableNameEmpty(Table table) {
-        return table != null && StringUtils.isBlank(table.name());
+        return table != null && !StringUtils.isBlank(table.name());
     }
 
     public static Map<String, String> getTableColumns(Class clazz) {
