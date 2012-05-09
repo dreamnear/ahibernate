@@ -12,32 +12,12 @@ import java.util.regex.Pattern;
 import com.hrw.framework.ahibernate.annotation.Column;
 import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.OneToMany;
-import com.hrw.framework.ahibernate.annotation.Table;
-import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
+import com.hrw.framework.ahibernate.table.TableUtils;
 
 public class Operate {
 
     public Operate(Class clazz) {
-        tableName = extractTableName(clazz);
-    }
-
-    public String extractTableName(Class clazz) {
-        Table table = (Table) clazz.getAnnotation(Table.class);
-        String name = null;
-        if (table != null && table.name() != null && table.name().length() > 0) {
-            name = table.name();
-        } else {
-            /*
-             * NOTE: to remove javax.persistence usage, comment the following
-             * line out
-             */
-            name = AhibernatePersistence.getEntityName(clazz);
-            if (name == null) {
-                // if the name isn't specified, it is the class name lowercased
-                name = clazz.getSimpleName().toLowerCase();
-            }
-        }
-        return name;
+        tableName = TableUtils.getTableName(clazz);
     }
 
     private String tableName;
