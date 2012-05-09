@@ -105,7 +105,7 @@ public class AhibernateDao<T> {
     }
 
     public void truncate(Class clazz) {
-        String sql = EMPTY_SQL + TableUtils.extractTableName(clazz);
+        String sql = EMPTY_SQL + TableUtils.getTableName(clazz);
         Log.d(TAG, "truncate sql:" + sql);
         SQLiteStatement stmt = null;
         try {

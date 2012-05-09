@@ -16,7 +16,6 @@ import android.database.sqlite.SQLiteDatabase;
 import com.hrw.framework.ahibernate.annotation.Column;
 import com.hrw.framework.ahibernate.annotation.Id;
 import com.hrw.framework.ahibernate.annotation.Table;
-import com.hrw.framework.ahibernate.dao.AhibernatePersistence;
 
 public class TableUtils {
     public static boolean DEBUG = false;
@@ -92,24 +91,6 @@ public class TableUtils {
         return sb.toString();
     }
 
-    public static String extractTableName(Class clazz) {
-        Table table = (Table) clazz.getAnnotation(Table.class);
-        String name = null;
-        if (table != null && table.name() != null && table.name().length() > 0) {
-            name = table.name();
-        } else {
-            /*
-             * NOTE: to remove javax.persistence usage, comment the following
-             * line out
-             */
-            name = AhibernatePersistence.getEntityName(clazz);
-            if (name == null) {
-                // if the name isn't specified, it is the class name lowercased
-                name = clazz.getSimpleName().toLowerCase();
-            }
-        }
-        return name;
-    }
 
     public static Field extractIdField(Class clazz) {
         Field idField = null;
