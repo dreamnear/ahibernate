@@ -1,6 +1,7 @@
 
 package com.hrw.framework.ahibernate.dao;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import android.util.Log;
 import com.hrw.framework.ahibernate.builder.EntityBuilder;
 import com.hrw.framework.ahibernate.sql.Delete;
 import com.hrw.framework.ahibernate.sql.Insert;
+import com.hrw.framework.ahibernate.sql.Operate;
 import com.hrw.framework.ahibernate.sql.Select;
 import com.hrw.framework.ahibernate.sql.Update;
 import com.hrw.framework.ahibernate.table.TableUtils;
@@ -83,6 +85,22 @@ public class AhibernateDao<T> {
         }
     }
 
+    public void update(T entity) {
+        String sql = new Update(entity).toStatementString();
+        Log.d(TAG, "update sql:" + sql);
+        SQLiteStatement stmt = null;
+        try {
+            stmt = db.compileStatement(sql);
+            stmt.execute();
+        } catch (android.database.SQLException e) {
+            Log.e(TAG, e.getMessage() + " sql:" + sql);
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
+    }
+
     public void delete(Class clazz, Map<String, String> where) {
         String sql = null;
         if (null == where) {
@@ -135,5 +153,37 @@ public class AhibernateDao<T> {
                 stmt.close();
             }
         }
+    }
+
+    public void truncate(Class clazz, Map<String, String> where) {
+
+        StringBuffer sql = new StringBuffer(EMPTY_SQL + TableUtils.getTableName(clazz));
+        Log.d(TAG, "truncate sql:" + sql);
+        if (where != null) {
+            sql.append(" WHERE ");
+            Iterator iter = where.entrySet().iterator();
+            while (iter.hasNext()) {
+                Map.Entry e = (Map.Entry) iter.next();
+                sql.append(e.getKey())
+                        .append(" = ")
+                        .append(Operate.isNumeric(e.getValue().toString()) ? e.getValue() : "'"
+                                + e.getValue() + "'");
+                if (iter.hasNext()) {
+                    sql.append(" AND ");
+                }
+            }
+        }
+        SQLiteStatement stmt = null;
+        try {
+            stmt = db.compileStatement(sql.toString());
+            stmt.execute();
+        } catch (android.database.SQLException e) {
+            Log.e(TAG, e.getMessage() + " sql:" + sql);
+        } finally {
+            if (stmt != null) {
+                stmt.close();
+            }
+        }
+
     }
 }
