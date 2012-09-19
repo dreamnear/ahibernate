@@ -1,10 +1,12 @@
 
 package com.hrw.framework.ahibernate.test.dao;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,12 @@ public class AhibernateDaoTest {
     public void setUp() {
         database = SQLiteDatabase.openDatabase("path", null, 0);
         dao = new AhibernateDao<Demo>(database);
+    }
+
+    @After
+    public void tearDown() {
+        database = null;
+        dao = null;
     }
 
     @Test
