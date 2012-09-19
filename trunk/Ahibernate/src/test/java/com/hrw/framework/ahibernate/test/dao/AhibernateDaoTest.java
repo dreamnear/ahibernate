@@ -1,7 +1,7 @@
 
 package com.hrw.framework.ahibernate.test.dao;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
@@ -12,22 +12,23 @@ import org.junit.runner.RunWith;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.hrw.framework.ahibernate.dao.AhibernateDao;
+import com.hrw.framework.ahibernate.table.TableUtils;
+import com.hrw.framework.ahibernate.test.domain.Demo;
 import com.xtremelabs.robolectric.RobolectricTestRunner;
 import com.xtremelabs.robolectric.shadows.ShadowSQLiteDatabase;
 
 @RunWith(RobolectricTestRunner.class)
 public class AhibernateDaoTest {
-    private AhibernateDao<?> dao;
+    private AhibernateDao<Demo> dao;
 
     protected SQLiteDatabase database;
 
     protected ShadowSQLiteDatabase shDatabase;
 
-    @SuppressWarnings("rawtypes")
     @Before
     public void setUp() {
         database = SQLiteDatabase.openDatabase("path", null, 0);
-        dao = new AhibernateDao(database);
+        dao = new AhibernateDao<Demo>(database);
     }
 
     @Test
@@ -41,7 +42,10 @@ public class AhibernateDaoTest {
     }
 
     @Test
-    public void should_return_true_when_create_db_sql() throws Exception {
-
+    public void should_return_true_when_create_table_sql() throws Exception {
+        TableUtils.createTable(database, true, Demo.class);
+        Demo entity = new Demo();
+        dao.insert(entity);
+        assertThat(1, equalTo(dao.queryList(entity).size()));
     }
 }
