@@ -1,0 +1,1 @@
+AndroidManifest.xml and res folder just for test.You can ignore.
